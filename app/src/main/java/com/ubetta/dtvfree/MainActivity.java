@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private Intent speechRecognizerIntent;
     private View[][] panelViews ;
     private View focusTemp;
-    private String homePage = "https://dtv.up.railway.app";
+    private String homePage = "https://google.com";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }else if(row == 1){
                     if(column == 0){
-                        column = 2;
+                        column = 3;
                     }else{
                         column --;
                     }
@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
                         column ++;
                     }
                 }else if(row == 1){
-                    if(column == 2){
+                    if(column == 3){
                         column = 0;
                     }else{
                         column ++;

@@ -128,6 +128,8 @@
                 android:layout_toEndOf="@id/refresh_button"
                 android:background="@drawable/button_default_background"
                 android:contentDescription="Close"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:src="@drawable/ic_close" />
 
         </RelativeLayout>

@@ -24,12 +24,14 @@
         android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen"
         android:hardwareAccelerated="true">
         <activity
+
             android:launchMode="singleTop"
             android:name=".MainActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            >
+            android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.SEARCH" />

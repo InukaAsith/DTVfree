@@ -1,8 +1,18 @@
+# DTVfree 
+
+## DreamTVfree 
+- Cursor support
+- Cross platform
+- Google search
+- Media playback support
+
 Web browser for android tv 
 
-Credits
+## Credits
 
-https://raw.githubusercontent.com/mehmetumit/VitaBrowser/
+https://github.com/mehmetumit/VitaBrowser/
+
+This is a modified version of vitabrowser. So huge respect for the developer 
 
 License
 
