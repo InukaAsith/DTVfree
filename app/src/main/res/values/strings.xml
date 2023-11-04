@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">DTV Free</string>
+    <string name="refresh_button">refresh button</string>
+    <string name="back_button">back button</string>
+    <string name="forward_button">forward button</string>
+    <string name="voice_button">voice button</string>
+    <string name="search_bar">search bar</string>
+    <string name="mouse_pointer">mouse pointer</string>
+</resources>

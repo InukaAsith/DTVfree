@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/loading_indicator">
+    <!-- Background circle -->
+    <item>
+        <shape
+            android:innerRadiusRatio="3"
+            android:shape="ring"
+            android:thicknessRatio="30.0">
+            <solid android:color="#E0E0E0"/>
+        </shape>
+    </item>
+    <!-- Progress bar -->
+    <item>
+        <rotate
+            android:fromDegrees="270"
+            android:toDegrees="270">
+            <shape
+                android:innerRadiusRatio="3"
+                android:shape="ring"
+                android:thicknessRatio="30.0">
+                <gradient
+                    android:endColor="#F44336"
+                    android:startColor="#F44336"
+                    android:type="sweep"
+                    android:useLevel="false"/>
+            </shape>
+        </rotate>
+    </item>
+</layer-list>
