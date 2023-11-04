@@ -187,6 +187,11 @@ public class MainActivity extends AppCompatActivity {
         panelViews[row][column].setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.voice_button_focus_background));
 
     }
+    @Override
+    public void onConfigurationChanged (Configuration newConfig) {
+        super.onConfigurationChanged (newConfig);
+        // You can perform any custom actions here when the orientation changes
+                    }
     private  void hideView(View v){
         v.setVisibility(View.GONE);
     }
