@@ -1,14 +1,11 @@
-
-
-
 package com.ubetta.dtvfree;
 
-        import android.content.pm.PackageManager;
-        import android.graphics.Bitmap;
-        import android.graphics.BitmapFactory;
-        import android.view.View;
-        import android.webkit.WebChromeClient;
-        import android.widget.FrameLayout;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.view.View;
+import android.webkit.WebChromeClient;
+import android.widget.FrameLayout;
 
 
 public class WebClient extends WebChromeClient {
@@ -18,6 +15,9 @@ public class WebClient extends WebChromeClient {
     private int mOriginalSystemUiVisibility;
     private MainActivity mainActivity;
     private boolean fullScreen = false;
+
+    // Add a Bundle variable to store the state of the webview
+    private Bundle webViewBundle;
 
     public WebClient(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
@@ -74,4 +74,26 @@ public class WebClient extends WebChromeClient {
                 ((FrameLayout)mainActivity.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
                  mainActivity.getWindow().getDecorView().setSystemUiVisibility(3846);
             }
-    }   
+    }
+
+    // Override the onPause method to save the state of the webview
+    @Override
+    public void onPause() {
+        super.onPause();
+        webViewBundle = new Bundle();
+        webView.saveState(webViewBundle);
+    }
+
+    // Override the onCreate method to restore the state of the webview
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (webViewBundle == null) {
+            // Load a new web page
+            webView.loadUrl("https://google.com");
+        } else {
+            // Restore the state of the webview
+            webView.restoreState(webViewBundle);
+        }
+    }
+}
