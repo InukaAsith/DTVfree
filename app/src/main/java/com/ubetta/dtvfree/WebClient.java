@@ -51,6 +51,10 @@ public class WebClient extends WebChromeClient {
             onHideCustomView();
             return;
         }
+        this.mCustomView = paramView;
+        this.mOriginalSystemUiVisibility = mainActivity.getWindow().getDecorView().getSystemUiVisibility();
+        this.mOriginalOrientation = mainActivity.getRequestedOrientation();
+        this.mCustomViewCallback = paramCustomViewCallback;
         PackageManager pm = mainActivity.getPackageManager ();
 
         // Check if the device is an Android TV
@@ -67,33 +71,10 @@ public class WebClient extends WebChromeClient {
                             | View.SYSTEM_UI_FLAG_IMMERSIVE);
         }
             else {
-              this.mCustomView = paramView;
-              this.mOriginalSystemUiVisibility = mainActivity.getWindow().getDecorView().getSystemUiVisibility();
-              this.mOriginalOrientation = mainActivity.getRequestedOrientation();
-              this.mCustomViewCallback = paramCustomViewCallback;
+                
                 ((FrameLayout)mainActivity.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
                  mainActivity.getWindow().getDecorView().setSystemUiVisibility(3846);
             }
     }
 
-    // Override the onPause method to save the state of the webview
-    @Override
-    public void onPause() {
-        super.onPause();
-        webViewBundle = new Bundle();
-        webView.saveState(webViewBundle);
-    }
 
-    // Override the onCreate method to restore the state of the webview
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (webViewBundle == null) {
-            // Load a new web page
-            webView.loadUrl("https://google.com");
-        } else {
-            // Restore the state of the webview
-            webView.restoreState(webViewBundle);
-        }
-    }
-}
