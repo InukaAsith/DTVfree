@@ -30,6 +30,7 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:configChanges="orientation|screenSize"
             android:exported="true">
 
             <intent-filter>
