@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private Intent speechRecognizerIntent;
     private View[][] panelViews ;
     private View focusTemp;
-    private String homePage = "https://google.com";
+    private String homePage = "https://dtv.up.railway.app";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

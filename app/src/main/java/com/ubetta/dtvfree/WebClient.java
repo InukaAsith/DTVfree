@@ -17,26 +17,26 @@ public class WebClient extends WebChromeClient {
     private boolean fullScreen = false;
 
     // Add a Bundle variable to store the state of the webview
-    private Bundle webViewBundle;
+
 
     public WebClient(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
 
-    public boolean isFullScreen(){
+    public boolean isFullScreen() {
         return fullScreen;
     }
 
-    public Bitmap getDefaultVideoPoster(){
+    public Bitmap getDefaultVideoPoster() {
         if (mainActivity == null) {
             return null;
         }
         return BitmapFactory.decodeResource(mainActivity.getApplicationContext().getResources(), 2130837573);
     }
 
-    public void onHideCustomView(){
+    public void onHideCustomView() {
         fullScreen = false;
-        ((FrameLayout)mainActivity.getWindow().getDecorView()).removeView(this.mCustomView);
+        ((FrameLayout) mainActivity.getWindow().getDecorView()).removeView(this.mCustomView);
         this.mCustomView = null;
         mainActivity.getWindow().getDecorView().setSystemUiVisibility(this.mOriginalSystemUiVisibility);
         mainActivity.setRequestedOrientation(this.mOriginalOrientation);
@@ -44,10 +44,9 @@ public class WebClient extends WebChromeClient {
         this.mCustomViewCallback = null;
     }
 
-    public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback paramCustomViewCallback){
+    public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback paramCustomViewCallback) {
         fullScreen = true;
-        if (this.mCustomView != null)
-        {
+        if (this.mCustomView != null) {
             onHideCustomView();
             return;
         }
@@ -55,10 +54,10 @@ public class WebClient extends WebChromeClient {
         this.mOriginalSystemUiVisibility = mainActivity.getWindow().getDecorView().getSystemUiVisibility();
         this.mOriginalOrientation = mainActivity.getRequestedOrientation();
         this.mCustomViewCallback = paramCustomViewCallback;
-        PackageManager pm = mainActivity.getPackageManager ();
+        PackageManager pm = mainActivity.getPackageManager();
 
         // Check if the device is an Android TV
-        boolean isTV = pm.hasSystemFeature (PackageManager.FEATURE_LEANBACK);
+        boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
 
         // If the device is not an Android TV, hide the status bar and the navigation bar
         if (!isTV) {
@@ -69,12 +68,10 @@ public class WebClient extends WebChromeClient {
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        } else {
+
+            ((FrameLayout) mainActivity.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
+            mainActivity.getWindow().getDecorView().setSystemUiVisibility(3846);
         }
-            else {
-                
-                ((FrameLayout)mainActivity.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
-                 mainActivity.getWindow().getDecorView().setSystemUiVisibility(3846);
-            }
     }
-
-
+}

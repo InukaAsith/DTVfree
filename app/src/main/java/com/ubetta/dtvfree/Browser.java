@@ -1,6 +1,7 @@
 package com.ubetta.dtvfree;
 
 import android.net.http.SslError;
+import android.os.Bundle;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -33,5 +34,6 @@ public class Browser extends WebViewClient {
     public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
         handler.proceed();
     }
+    // Override the onPause method to save the state of the webview
 
 }
