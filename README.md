@@ -1,8 +1,11 @@
+#DTVfree 
+##DreamTVfree 
+
 Web browser for android tv 
 
 Credits
 
-https://raw.githubusercontent.com/mehmetumit/VitaBrowser/
+https://github.com/mehmetumit/VitaBrowser/
 
 License
 
