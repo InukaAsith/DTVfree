@@ -54,6 +54,7 @@ public class WebClient extends WebChromeClient {
         this.mOriginalSystemUiVisibility = mainActivity.getWindow().getDecorView().getSystemUiVisibility();
         this.mOriginalOrientation = mainActivity.getRequestedOrientation();
         this.mCustomViewCallback = paramCustomViewCallback;
+        ((FrameLayout) mainActivity.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
         PackageManager pm = mainActivity.getPackageManager();
 
         // Check if the device is an Android TV
@@ -68,9 +69,7 @@ public class WebClient extends WebChromeClient {
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE);
-        } else {
-
-            ((FrameLayout) mainActivity.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
+        } else {            
             mainActivity.getWindow().getDecorView().setSystemUiVisibility(3846);
         }
     }

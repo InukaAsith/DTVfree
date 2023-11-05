@@ -133,7 +133,13 @@ public class MainActivity extends AppCompatActivity {
                     searchBar.clearFocus();
                     InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     in.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    searchBar.setText("");
+                    String queary = webView.getUrl();
+                    if (queary!= null) {
+                        searchBar.setText(queary);
+                    }
+                    else {
+                        searchBar.setText("");
+                    }
                 }
                 return false;
             }
@@ -176,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
                 // Hide the loading indicator when the webview finishes loading
                 loadingIndicator.setVisibility(View.GONE);
                 super.onPageFinished(view, url);
+                searchBar.setHint(webView.getUrl());
             }
         });
 
