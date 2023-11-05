@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private Intent speechRecognizerIntent;
     private View[][] panelViews ;
     private View focusTemp;
-    private String homePage = "https://dtv.up.railway.app";
+    private String homePage = "https://google.com";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
