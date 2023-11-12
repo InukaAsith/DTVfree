@@ -13,8 +13,8 @@
         android:id="@+id/web_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_alignParentBottom="true"/>
     <ImageView
         android:id="@+id/mouse_pointer"
