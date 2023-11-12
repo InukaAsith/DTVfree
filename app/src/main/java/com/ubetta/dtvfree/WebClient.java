@@ -71,6 +71,7 @@ public class WebClient extends WebChromeClient {
                             | View.SYSTEM_UI_FLAG_IMMERSIVE);
         } else {            
             mainActivity.getWindow().getDecorView().setSystemUiVisibility(3846);
+            this.mCustomViewCallback.onCustomViewHidden();
         }
     }
 }
