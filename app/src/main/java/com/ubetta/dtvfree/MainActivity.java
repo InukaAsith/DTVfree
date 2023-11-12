@@ -452,7 +452,7 @@ public class MainActivity extends AppCompatActivity {
                         column ++;
                     }
                 }else if(row == 1){
-                    if(column == 3){
+                    if(column == 4){
                         column = 0;
                     }else{
                         column ++;
@@ -556,11 +556,6 @@ public class MainActivity extends AppCompatActivity {
         keyCode = event.getKeyCode();
         if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_BACK || keyCode ==  KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 
-            if (keyCode != KeyEvent.KEYCODE_BACK){
-                if (webClient.isFullScreen()) {
-                    return super.dispatchKeyEvent(event);
-                }
-            }
             if (dialogBack.getVisibility() == View.VISIBLE && event.getAction() != KeyEvent.ACTION_UP) {
                 dialogEvent(keyCode);
             } else {//Dialog not visible
