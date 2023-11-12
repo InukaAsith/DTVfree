@@ -554,9 +554,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         keyCode = event.getKeyCode();
-        if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_BACK) {
+        if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_BACK || keyCode ==  KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 
-
+            if (keyCode != KeyEvent.KEYCODE_BACK){
+                if (webClient.isFullScreen()) {
+                    return super.dispatchKeyEvent(event);
+                }
+            }
             if (dialogBack.getVisibility() == View.VISIBLE && event.getAction() != KeyEvent.ACTION_UP) {
                 dialogEvent(keyCode);
             } else {//Dialog not visible
@@ -589,7 +593,7 @@ public class MainActivity extends AppCompatActivity {
                 switch (keyCode) {
                     case KeyEvent.KEYCODE_DPAD_CENTER:
                         if (webClient.isFullScreen()) {
-                            break;
+                            return super.dispatchKeyEvent(event);
                         }
                         final long uMillis = SystemClock.uptimeMillis();
                         frame.dispatchTouchEvent(MotionEvent.obtain(uMillis, uMillis,
@@ -634,7 +638,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         break;
                     default:
-                        break;
+                        return super.dispatchKeyEvent(event);
                 }
                 if (firstDown) {
                     firstDown = false;
@@ -650,7 +654,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         }else{
-            return true;
+            return super.dispatchKeyEvent(event);
         }
     }
 
