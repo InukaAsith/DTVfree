@@ -587,9 +587,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 switch (keyCode) {
                     case KeyEvent.KEYCODE_DPAD_CENTER:
-                        if (webClient.isFullScreen()) {
-                            return super.dispatchKeyEvent(event);
-                        }
                         final long uMillis = SystemClock.uptimeMillis();
                         frame.dispatchTouchEvent(MotionEvent.obtain(uMillis, uMillis,
                                 MotionEvent.ACTION_DOWN, x, y, 0));
@@ -632,8 +629,7 @@ public class MainActivity extends AppCompatActivity {
                             panelViews[row][column].requestFocus();
                         }
                         break;
-                    default:
-                        return super.dispatchKeyEvent(event);
+                    
                 }
                 if (firstDown) {
                     firstDown = false;
