@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // get your string from SharedPreferences
-        String homepge = sharedPref.getString("homepage", "https://dtv.up.railway.app");
+        String homepge = sharedPref.getString("homepage", homePage);
 
 
         boolean isFirstTime = sharedPref.getBoolean("isFirstTime", true);
@@ -121,11 +121,12 @@ public class MainActivity extends AppCompatActivity {
         if (isFirstTime) {
             // create an AlertDialog builder
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Set a Custom homepage");
-
+            builder.setTitle("Welcome Back");
+            builder.setMessage("If you want to load an custom website as homepage enter it below. ");
             // create an EditText for the user to input data
             final EditText input = new EditText(this);
-
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            input.setHint(" Default is dtv.tkonly.xyz");
             // set the EditText as the view of the AlertDialog
             builder.setView(input);
 
@@ -145,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
 // apply the changes
                         editor.apply();
-                        Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect  ", Toast.LENGTH_SHORT).show();
                     }
                     else if (data.toLowerCase().indexOf(webqr.toLowerCase()) != -1) {
                         String homestr = ("https://" + data);
@@ -153,19 +154,19 @@ public class MainActivity extends AppCompatActivity {
 // edit the value of myString
                         editor.putString("homepage", homestr);
                         editor.apply();
-                        Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect  ", Toast.LENGTH_SHORT).show();
 // apply the changes
 
                     }
                     else {
-                        String homestr = ("https://google.com/search?q=" + data);
+                        String homestr = homePage;
                         SharedPreferences.Editor editor = sharedPref.edit();
 // edit the value of myString
                         editor.putString("homepage", homestr);
 
 // apply the changes
                         editor.apply();
-                        Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Entered format is invalid Homepage set to " + homestr + "  Please restart application in order for changes to take effect  ", Toast.LENGTH_SHORT).show();
                     }
                     //sharedPref.edit().putString("homepage", data).apply();
 
@@ -176,6 +177,9 @@ public class MainActivity extends AppCompatActivity {
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    sharedPref.edit().putBoolean("isFirstTime", false).apply();
+                    editor.apply();
                     // cancel the dialog
                     dialog.cancel();
                 }
@@ -215,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
 
 // set the input type and hint
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
-                input.setHint("Enter a value");
+                input.setHint("Enter new website or webaddress");
 
 // set the EditText object as the view of the AlertDialog.Builder object
                 builder.setView(input);
@@ -250,14 +254,17 @@ public class MainActivity extends AppCompatActivity {
 
                         }
                         else {
-                            String homestr = ("https://google.com/search?q=" + value);
+                            String homestr = homePage;
                             SharedPreferences.Editor editor = sharedPref.edit();
 // edit the value of myString
                             editor.putString("homepage", homestr);
 
 // apply the changes
                             editor.apply();
-                            Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Entered format is invalid Homepage set to " + homestr + "  Please restart application in order for changes to take effect  ", Toast.LENGTH_SHORT).show();
+
+
+// apply the changes
                         }
                         // store it in the variable
                         // you can use any variable name you want
@@ -456,6 +463,7 @@ public class MainActivity extends AppCompatActivity {
                     .setNegativeButton("Cancel", (dialog, which) -> {})
                     .show();
         });
+
         if (savedInstanceState != null) {
             webView.restoreState(savedInstanceState);
         }else{
@@ -527,6 +535,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void startDownload(String url, String filename) {
         checkPermission();
+        Toast.makeText(MainActivity.this, "Download Started", Toast.LENGTH_SHORT).show();
         if (filename == null) {
             filename = URLUtil.guessFileName(url, null, null);
         }
