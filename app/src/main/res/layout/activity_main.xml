@@ -9,13 +9,14 @@
     tools:context=".MainActivity"
     android:focusable="false"
     android:focusableInTouchMode="false">
+
     <WebView
         android:id="@+id/web_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
         android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:layout_alignParentBottom="true"/>
+        android:focusableInTouchMode="true" />
     <ImageView
         android:id="@+id/mouse_pointer"
         android:layout_width="30dp"
@@ -48,7 +49,8 @@
             android:layout_centerInParent="true"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:visibility="visible">
+            android:visibility="visible"
+            tools:visibility="visible">
 
             <EditText
                 android:id="@+id/search_bar"
@@ -146,6 +148,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:src="@drawable/ic_close" />
+
 
         </RelativeLayout>
 

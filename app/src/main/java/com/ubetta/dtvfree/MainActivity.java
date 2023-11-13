@@ -1,30 +1,54 @@
 package com.ubetta.dtvfree;
 import android.Manifest;
+
 import android.app.AlertDialog;
+
+import android.app.DownloadManager;
 import android.app.SearchManager;
+import android.content.ActivityNotFoundException;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+
 import android.graphics.Bitmap;
+
+import android.net.Uri;
+
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.CookieManager;
+
+import android.webkit.URLUtil;
+
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
 import android.widget.EditText;
+
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -32,18 +56,20 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import java.util.ArrayList;
-import java.util.Locale;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
-//android:theme="@style/Theme.VitaBrowser"
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
+
     private ImageView mousePointer;
     private  CountDownTimer pointerVisibilityTimer;
     Timer pointerMoveTimer;
@@ -59,11 +85,16 @@ public class MainActivity extends AppCompatActivity {
     private boolean firstDown = true;
     private ImageButton homeButton,forwardButton,backButton,refreshButton, editButton, closeButton;
     private View[][] panelViews ;
-    private View focusTemp;
 
+    static final int PERMISSION_REQUEST_DOWNLOAD = 3;
 
+    private void checkPermission() {
 
-    private String homePage = "https://dtv.up.railway.app";
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_REQUEST_DOWNLOAD);
+        }
+    }
+    private String homePage = "https://dtv.tkonly.xyz/dtv/dtv.php";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
         homeButton = findViewById(R.id.home_button);
         closeButton = findViewById(R.id.close_button);
         editButton = findViewById(R.id.edit_button);
+
         homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -340,19 +372,98 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-        webView = findViewById(R.id.web_view);
-        ProgressBar loadingIndicator = findViewById(R.id.loading_indicator);
 
+
+
+        webView = findViewById(R.id.web_view);
+        
+
+        ProgressBar loadingIndicator = findViewById(R.id.loading_indicator);
         webView.setWebViewClient(browser = new Browser(searchBar,webView));
         webView.setWebChromeClient(webClient = new WebClient(this));
 
         WebSettings webSettings = webView.getSettings();
+        webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        webSettings.setAllowUniversalAccessFromFileURLs(true);
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setBuiltInZoomControls(true);
+        webSettings.setDisplayZoomControls(false);
+        webSettings.setLoadWithOverviewMode(true);
+
         // enable JavaScript
         webSettings.setJavaScriptEnabled(true);
         // enable web storage
         webSettings.setDomStorageEnabled(true);
-        webView.loadUrl(homepge);
+        webView.setOnLongClickListener(v -> {
+            String url = null, imageUrl = null;
+            WebView.HitTestResult r = ((WebView) v).getHitTestResult();
+            switch (r.getType()) {
+                case WebView.HitTestResult.SRC_ANCHOR_TYPE:
+                    url = r.getExtra();
+                    break;
+                case WebView.HitTestResult.IMAGE_TYPE:
+                    imageUrl = r.getExtra();
+                    break;
+                case WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
+                case WebView.HitTestResult.EMAIL_TYPE:
+                case WebView.HitTestResult.UNKNOWN_TYPE:
+                    Handler handler = new Handler();
+                    Message message = handler.obtainMessage();
+                    ((WebView)v).requestFocusNodeHref(message);
+                    url = message.getData().getString("url");
+                    if ("".equals(url)) {
+                        url = null;
+                    }
+                    imageUrl = message.getData().getString("src");
+                    if ("".equals(imageUrl)) {
+                        imageUrl = null;
+                    }
+                    if (url == null && imageUrl == null) {
+                        return false;
+                    }
+                    break;
+                default:
+                    return false;
+            }
+            showLongPressMenu(url, imageUrl);
+            return true;
+        });
+        webView.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
+            String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Download")
+                    .setMessage(String.format("Filename: %s\nSize: %.2f MB\nURL: %s",
+                            filename,
+                            contentLength / 1024.0 / 1024.0,
+                            url))
+                    .setPositiveButton("Download", (dialog, which) -> startDownload(url, filename))
+                    .setNeutralButton("Open", (dialog, which) -> {
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(url));
+                        try {
+                            startActivity(i);
+                        } catch (ActivityNotFoundException e) {
+                            new AlertDialog.Builder(MainActivity.this)
+                                    .setTitle("Open")
+                                    .setMessage("Can't open files of this type. Try downloading instead.")
+                                    .setPositiveButton("OK", (dialog1, which1) -> {})
+                                    .show();
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {})
+                    .show();
+        });
+        if (savedInstanceState != null) {
+            webView.restoreState(savedInstanceState);
+        }else{
+            webView.loadUrl(homepge);
+        }
+
         webView.getSettings().setJavaScriptEnabled(true);
+
 // Set a webview client to the webview
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -369,9 +480,35 @@ public class MainActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 searchBar.setHint(webView.getUrl());
             }
+
+
+
+
+
+
+            final InputStream emptyInputStream = new ByteArrayInputStream(new byte[0]);
+
+            String lastMainPage = "";
+
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+
+                return super.shouldInterceptRequest(view, request);
+            }
+
+
+
+            final String[] sslErrors = {"Not yet valid", "Expired", "Hostname mismatch", "Untrusted CA", "Invalid date", "Unknown error"};
+
+
+
+
         });
 
         webView.getSettings().setSupportMultipleWindows(false);
+
+
         panelViews = new View[][]{{searchBar, homeButton}, {backButton,forwardButton,refreshButton,editButton ,closeButton}};
         row = 0;
         column = 1;
@@ -384,9 +521,117 @@ public class MainActivity extends AppCompatActivity {
     public void onConfigurationChanged (Configuration newConfig) {
         super.onConfigurationChanged (newConfig);
         // You can perform any custom actions here when the orientation changes
-                    }
+    }
     private  void hideView(View v){
         v.setVisibility(View.GONE);
+    }
+    private void startDownload(String url, String filename) {
+        checkPermission();
+        if (filename == null) {
+            filename = URLUtil.guessFileName(url, null, null);
+        }
+        DownloadManager.Request request;
+        try {
+            request = new DownloadManager.Request(Uri.parse(url));
+        } catch (IllegalArgumentException e) {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Can't Download URL")
+                    .setMessage(url)
+                    .setPositiveButton("OK", (dialog1, which1) -> {})
+                    .show();
+            return;
+        }
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+        String cookie = CookieManager.getInstance().getCookie(url);
+        if (cookie != null) {
+            request.addRequestHeader("Cookie", cookie);
+        }
+        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        assert dm != null;
+        dm.enqueue(request);
+    }
+
+    private void showLongPressMenu(String linkUrl, String imageUrl) {
+        String url;
+        String title;
+        String[] options = new String[]{"Open in new tab", "Copy URL", "Show full URL", "Download"};
+
+        if (imageUrl == null) {
+            if (linkUrl == null) {
+                throw new IllegalArgumentException("Bad null arguments in showLongPressMenu");
+            } else {
+                // Text link
+                url = linkUrl;
+                title = linkUrl;
+            }
+        } else {
+            if (linkUrl == null) {
+                // Image without link
+                url = imageUrl;
+                title = "Image: " + imageUrl;
+            } else {
+                // Image with link
+                url = linkUrl;
+                title = linkUrl;
+                String[] newOptions = new String[options.length + 1];
+                System.arraycopy(options, 0, newOptions, 0, options.length);
+                newOptions[newOptions.length - 1] = "Image Options";
+                options = newOptions;
+            }
+        }
+        new AlertDialog.Builder(MainActivity.this).setTitle(title).setItems(options, (dialog, which) -> {
+            switch (which) {
+                case 0:
+                    newTab(url);
+                    break;
+                case 1:
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    assert clipboard != null;
+                    ClipData clipData = ClipData.newPlainText("URL", url);
+                    clipboard.setPrimaryClip(clipData);
+                    break;
+                case 2:
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setTitle("Full URL")
+                            .setMessage(url)
+                            .setPositiveButton("OK", (dialog1, which1) -> {})
+                            .show();
+                    break;
+                case 3:
+                    startDownload(url, null);
+                    break;
+                case 4:
+                    showLongPressMenu(null, imageUrl);
+                    break;
+            }
+        }).show();
+    }
+
+    private void newTab(String url) {
+        webView = findViewById(R.id.web_view);
+
+        ProgressBar loadingIndicator = findViewById(R.id.loading_indicator);
+        webView.setWebViewClient(browser = new Browser(searchBar,webView));
+        webView.setWebChromeClient(webClient = new WebClient(this));
+
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        webSettings.setAllowUniversalAccessFromFileURLs(true);
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setBuiltInZoomControls(true);
+        webSettings.setDisplayZoomControls(false);
+        webSettings.setLoadWithOverviewMode(true);
+        // enable JavaScript
+        webSettings.setJavaScriptEnabled(true);
+        // enable web storage
+        webSettings.setDomStorageEnabled(true);
+
+        webView.loadUrl(url);;
+
     }
 
     public void doSearch(String query){
@@ -452,7 +697,7 @@ public class MainActivity extends AppCompatActivity {
                         column ++;
                     }
                 }else if(row == 1){
-                    if(column == 3){
+                    if(column == 4){
                         column = 0;
                     }else{
                         column ++;
@@ -554,8 +799,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         keyCode = event.getKeyCode();
-        if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_BACK) {
-
+        if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_BACK || keyCode ==  KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 
             if (dialogBack.getVisibility() == View.VISIBLE && event.getAction() != KeyEvent.ACTION_UP) {
                 dialogEvent(keyCode);
@@ -588,9 +832,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 switch (keyCode) {
                     case KeyEvent.KEYCODE_DPAD_CENTER:
-                        if (webClient.isFullScreen()) {
-                            break;
-                        }
                         final long uMillis = SystemClock.uptimeMillis();
                         frame.dispatchTouchEvent(MotionEvent.obtain(uMillis, uMillis,
                                 MotionEvent.ACTION_DOWN, x, y, 0));
@@ -633,8 +874,7 @@ public class MainActivity extends AppCompatActivity {
                             panelViews[row][column].requestFocus();
                         }
                         break;
-                    default:
-                        break;
+
                 }
                 if (firstDown) {
                     firstDown = false;
@@ -650,7 +890,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         }else{
-            return true;
+            return super.dispatchKeyEvent(event);
         }
     }
 
