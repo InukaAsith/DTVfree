@@ -531,7 +531,7 @@ public class MainActivity extends AppCompatActivity {
         webView.getSettings().setSupportMultipleWindows(false);
 
 
-        panelViews = new View[][]{{searchBar, homeButton}, {backButton,forwardButton,refreshButton,editButton ,closeButton}};
+        panelViews = new View[][]{{searchBar, homeButton}, {backButton,forwardButton,refreshButton,editButton ,updateButton, closeButton}};
         row = 0;
         column = 1;
         panelViews[row][column].setFocusable(true);
@@ -706,7 +706,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }else if(row == 1){
                     if(column == 0){
-                        column = 4;
+                        column = 5;
                     }else{
                         column --;
                     }
@@ -720,7 +720,7 @@ public class MainActivity extends AppCompatActivity {
                         column ++;
                     }
                 }else if(row == 1){
-                    if(column == 4){
+                    if(column == 5){
                         column = 0;
                     }else{
                         column ++;
