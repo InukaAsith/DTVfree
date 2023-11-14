@@ -136,13 +136,27 @@
                 android:src="@drawable/ic_edit" />
 
             <ImageButton
-                android:id="@+id/close_button"
+                android:id="@+id/update_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_below="@+id/search_bar"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_toEndOf="@id/edit_button"
+                android:background="@drawable/button_default_background"
+                android:contentDescription="Close"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:src="@drawable/ic_update" />
+
+            <ImageButton
+                android:id="@+id/close_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/search_bar"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@id/update_button"
                 android:background="@drawable/button_default_background"
                 android:contentDescription="Close"
                 android:focusable="true"

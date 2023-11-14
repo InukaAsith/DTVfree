@@ -4,7 +4,10 @@
 
 ### Simple, fast and lightweight Web browser for Android TV, GoogleTV® and FireStick®
 
+- Downoad Support
+- Custom Homepage
 - Cursor support
+- login support
 - Cross platform
 - Google search
 - Media playback support
@@ -14,8 +17,6 @@
 ## Credits
 
 https://github.com/mehmetumit/VitaBrowser/
-
-This is a modified version of vitabrowser. So huge respect for the developer 
 
 ### License
 
