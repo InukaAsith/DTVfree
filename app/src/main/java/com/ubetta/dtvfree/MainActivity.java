@@ -773,9 +773,14 @@ public class MainActivity extends AppCompatActivity {
                 panelViews[rowTemp][columnTemp].setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.search_bar_background));
             }else{
                 panelViews[rowTemp][columnTemp].setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.voice_button_background_default));
+                    
             }
         }else {
             panelViews[rowTemp][columnTemp].setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.button_default_background));
+                    if (nocursor) {
+            cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+
+        }
         }
         if(row == 0 ){
             if(column == 0) {
@@ -785,6 +790,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }else {
             panelViews[row][column].setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.button_focus_background));
+                    if (nocursor) {
+            cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+
+        }
         }
     }
     public void dialogEvent(int keyCode){
@@ -1012,10 +1021,10 @@ public class MainActivity extends AppCompatActivity {
                         if (webClient.isFullScreen()) {
                             webClient.onHideCustomView();
                         } else {
-                            if (nocursor) {
-                                cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+                           // if (nocursor) {
+                              //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
 
-                            }
+                            //}
                             dialogBack.setVisibility(View.VISIBLE);
                             panelViews[row][column].requestFocus();
                         }
