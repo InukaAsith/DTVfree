@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean nocursor = false;
     private String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
-    private String version = "v4.2.0";
+    private String version = "v4.2.1";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
 
         // get your string from SharedPreferences
         String homepge = sharedPref.getString("homepage", homePage);
+        boolean cursormode = sharedPref.getBoolean("nocursor", false);
+        nocursor = cursormode;
 
 
 
@@ -217,22 +219,28 @@ public class MainActivity extends AppCompatActivity {
         cursorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               
+                //SharedPreferences sharedPref2 = getSharedPreferences("myPref", MODE_PRIVATE);
+
                 if (nocursor) {
 
                     nocursor = false;
                     Toast.makeText(MainActivity.this, "Mouse Cursor Enabled", Toast.LENGTH_SHORT).show();
                     cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background_def));
-                    hideView(dialogBack);
+                    hideView(dialogBack)
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    sharedPref.edit().putBoolean("nocursor", false).apply();
+                    editor.apply();
+                    
                 }
                 else{
-                   // SharedPreferences.Editor editor = sharedPref2.edit();
-                   // sharedPref2.edit().putBoolean("nocursor", true).apply();
-                    //editor.apply();
                     nocursor = true;
                     cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
                     Toast.makeText(MainActivity.this, "Mouse Cursor Disabled", Toast.LENGTH_SHORT).show();
                     hideView(dialogBack);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    sharedPref.edit().putBoolean("nocursor", true).apply();
+                    editor.apply();
+                    
                 }
 
             }
