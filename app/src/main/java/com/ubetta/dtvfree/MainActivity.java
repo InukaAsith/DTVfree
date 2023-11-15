@@ -1,4 +1,6 @@
 package com.ubetta.dtvfree;
+import static android.app.ProgressDialog.show;
+
 import android.Manifest;
 
 import android.app.AlertDialog;
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText searchBar ;
     private RelativeLayout frame,dialogBack;
     private boolean firstDown = true;
-    private ImageButton homeButton,forwardButton,backButton,refreshButton, editButton, closeButton, updateButton;
+    private ImageButton homeButton,forwardButton,backButton,refreshButton, editButton, closeButton, updateButton, cursorButton;
     private View[][] panelViews ;
 
     static final int PERMISSION_REQUEST_DOWNLOAD = 3;
@@ -94,9 +96,11 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_REQUEST_DOWNLOAD);
         }
     }
-    private String homePage = "https://dtv.tkonly.xyz/dtv/dtv.php";
+    private String homePage = "https://datafreetv.live/";
+
+    private boolean nocursor = false;
     private String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
-    private String version = "v4.1.4";
+    private String version = "v4.2.0";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
 // check if the app is launched for the first time
         // get SharedPreferences
         SharedPreferences sharedPref = getSharedPreferences("myPref", MODE_PRIVATE);
+
         // get the SharedPreferences.Editor object
 
 
@@ -116,7 +121,8 @@ public class MainActivity extends AppCompatActivity {
         String homepge = sharedPref.getString("homepage", homePage);
 
 
-        boolean isFirstTime = sharedPref.getBoolean("isFirstTime", true);
+
+        boolean isFirstTime = sharedPref.getBoolean("isFirstTime", false);
 
 // if yes, show the popup message
 
@@ -192,6 +198,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         homeButton = findViewById(R.id.home_button);
+        cursorButton = findViewById(R.id.cursor_button);
+        if (nocursor) {
+            cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+
+        }
+
         closeButton = findViewById(R.id.close_button);
         editButton = findViewById(R.id.edit_button);
         updateButton = findViewById(R.id.update_button);
@@ -202,22 +214,45 @@ public class MainActivity extends AppCompatActivity {
                 hideView(dialogBack);
             }
         });
+        cursorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               
+                if (nocursor) {
+
+                    nocursor = false;
+                    Toast.makeText(MainActivity.this, "Mouse Cursor Enabled", Toast.LENGTH_SHORT).show();
+                    cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background_def));
+                    hideView(dialogBack);
+                }
+                else{
+                   // SharedPreferences.Editor editor = sharedPref2.edit();
+                   // sharedPref2.edit().putBoolean("nocursor", true).apply();
+                    //editor.apply();
+                    nocursor = true;
+                    cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+                    Toast.makeText(MainActivity.this, "Mouse Cursor Disabled", Toast.LENGTH_SHORT).show();
+                    hideView(dialogBack);
+                }
+
+            }
+        });
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
-        closeButton.setOnClickListener(new View.OnClickListener() {
+        updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 webView.loadUrl(sourcecode);
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("Download Update")
-                        .setMessage("Current app version is" + version + ".  Goto assets and download latest apk file and install it from your file manager app")
+                        .setMessage("Current app version is " + version + ".  Goto assets and download latest apk file and install it from your file manager app")
                         .setPositiveButton("OK", (dialog1, which1) -> {})
                         .show();
-
+                hideView(dialogBack);
             }
         });
         editButton.setOnClickListener(new View.OnClickListener() {
@@ -531,7 +566,7 @@ public class MainActivity extends AppCompatActivity {
         webView.getSettings().setSupportMultipleWindows(false);
 
 
-        panelViews = new View[][]{{searchBar, homeButton}, {backButton,forwardButton,refreshButton,editButton ,updateButton, closeButton}};
+        panelViews = new View[][]{{searchBar, homeButton}, {backButton,forwardButton,cursorButton,refreshButton,editButton ,updateButton, closeButton}};
         row = 0;
         column = 1;
         panelViews[row][column].setFocusable(true);
@@ -706,7 +741,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }else if(row == 1){
                     if(column == 0){
-                        column = 5;
+                        column = 6;
                     }else{
                         column --;
                     }
@@ -720,7 +755,7 @@ public class MainActivity extends AppCompatActivity {
                         column ++;
                     }
                 }else if(row == 1){
-                    if(column == 5){
+                    if(column == 6){
                         column = 0;
                     }else{
                         column ++;
@@ -821,12 +856,24 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+
+        SharedPreferences sharedPref = getSharedPreferences("myPref", MODE_PRIVATE);
         keyCode = event.getKeyCode();
         if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_BACK || keyCode ==  KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 
             if (dialogBack.getVisibility() == View.VISIBLE && event.getAction() != KeyEvent.ACTION_UP) {
                 dialogEvent(keyCode);
             } else {//Dialog not visible
+                if (nocursor) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK){
+                        dialogBack.setVisibility(View.VISIBLE);
+                        panelViews[row][column].requestFocus();
+
+                    }else{
+                        return super.dispatchKeyEvent(event);
+                    }
+                    }
+
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     if (pointerMoveTimer != null) {
                         pointerMoveTimer.cancel();
@@ -870,20 +917,92 @@ public class MainActivity extends AppCompatActivity {
                         // If the device is not an Android TV, hide the status bar and the navigation bar
                         if (!isTV) {
                             if (!webView.canGoBack()) {
-                                new AlertDialog.Builder(this)
-                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                        .setTitle("Closing Application")
-                                        .setMessage("Are you sure you want to close this application?")
-                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                // call the finish method to end the activity
-                                                finish();
-                                            }
-                                        })
-                                        .setNegativeButton("No", null)
-                                        .show();
                                 hideView(dialogBack);
+                                // create an array of items to display
+                                CharSequence[] items = {"Exit", "Edit Homepage", "Check Update", "Cancel"};
+
+// create an alert dialog builder
+                                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                                builder.setTitle("Exitting Application");
+
+// add the items to the dialog
+                                builder.setItems(items, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // handle the click event of each item
+                                        switch (which) {
+                                            case 0:
+                                                finish();
+                                                break;
+                                            case 1:
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                builder.setTitle("Edit Homepage");
+                                                builder.setMessage("Enter new website or webaddress");
+                                                final EditText input = new EditText(MainActivity.this);
+                                                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                                                input.setHint("Enter new website or webaddress");
+                                                builder.setView(input);
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // get the input value from the EditText object
+                                                        String value = input.getText().toString();
+                                                        String search = "https";
+                                                        String webqr = ".com";
+
+                                                        if (value.toLowerCase().indexOf(search.toLowerCase()) != -1) {
+                                                            String homestr = value;
+                                                            SharedPreferences.Editor editor = sharedPref.edit();
+                                                            editor.putString("homepage", homestr);
+                                                            editor.apply();
+                                                            Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                        else if (value.toLowerCase().indexOf(webqr.toLowerCase()) != -1) {
+                                                            String homestr = ("https://" + value);
+                                                            SharedPreferences.Editor editor = sharedPref.edit();
+                                                            editor.putString("homepage", homestr);
+                                                            editor.apply();
+                                                            Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect", Toast.LENGTH_SHORT).show();
+
+                                                        }
+                                                        else {
+                                                            String homestr = homePage;
+                                                            SharedPreferences.Editor editor = sharedPref.edit();
+                                                            editor.putString("homepage", homestr);
+                                                            editor.apply();
+                                                            Toast.makeText(MainActivity.this, "Entered format is invalid Homepage set to " + homestr + "  Please restart application in order for changes to take effect  ", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+                                                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // cancel the dialog
+                                                        dialog.cancel();
+                                                    }
+                                                });
+
+// create and show the AlertDialog object from the AlertDialog.Builder object
+                                                AlertDialog newdialog = builder.create();
+                                                newdialog.show();
+                                                hideView(dialogBack);
+                                                break;
+                                            case 2:
+                                                webView.loadUrl(sourcecode);
+                                                hideView(dialogBack);
+                                                // do something for button 3
+                                                break;
+                                            case 3:
+                                                hideView(dialogBack);
+                                                // do something for button 4
+                                                break;
+                                        }
+                                    }
+                                });
+
+// create and show the dialog
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
 
                             } else {
                                 webView.goBack();
@@ -893,6 +1012,10 @@ public class MainActivity extends AppCompatActivity {
                         if (webClient.isFullScreen()) {
                             webClient.onHideCustomView();
                         } else {
+                            if (nocursor) {
+                                cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+
+                            }
                             dialogBack.setVisibility(View.VISIBLE);
                             panelViews[row][column].requestFocus();
                         }
