@@ -42,7 +42,7 @@
         android:background="@color/colorHalfTransparentBlack"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <RelativeLayout
             android:id="@+id/dialog_panel"
@@ -51,8 +51,7 @@
             android:layout_centerInParent="true"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:visibility="visible"
-            tools:visibility="visible">
+            android:visibility="visible">
 
             <EditText
                 android:id="@+id/search_bar"
@@ -192,8 +191,7 @@
                 android:layout_width="0dp"
                 android:layout_height="5dp"
                 android:layout_below="@+id/back_button"
-                android:background="?android:attr/listDivider"
-                android:visibility="visible" />
+                android:background="?android:attr/listDivider" />
 
             <ImageButton
                 android:id="@+id/addsaved_button"

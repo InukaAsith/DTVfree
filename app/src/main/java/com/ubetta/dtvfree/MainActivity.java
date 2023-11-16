@@ -98,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
     }
     private String homePage = "https://datafreetv.live/";
 
+    private String site1 = "https://datafreetv.live/dtv.html";
+    private String site2 = "https://datafreetv.live/peotvgo.html";
     private boolean nocursor = false;
     private String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
     private String version = "v4.2.1";
@@ -124,69 +126,33 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        boolean isFirstTime = sharedPref.getBoolean("isFirstTime", false);
+        boolean isFirstTime = sharedPref.getBoolean("isFirstTime", true);
+        SharedPreferences sitelist = getSharedPreferences ("saved_sites", MODE_PRIVATE);
 
 // if yes, show the popup message
 
         if (isFirstTime) {
-            // create an AlertDialog builder
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Welcome Back");
-            builder.setMessage("If you want to load an custom website as homepage enter it below. ");
-            // create an EditText for the user to input data
-            final EditText input = new EditText(this);
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            input.setHint(" Default is dtv.tkonly.xyz");
-            // set the EditText as the view of the AlertDialog
-            builder.setView(input);
-
-            // set up the buttons
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            builder.setMessage("Thanks for installing application. 🎉 \n\nData Free TV" + version + "\nCurrent Homepage:" + homepge + "\n\nFor faster performance and reduced data usage applications to uses offline webpage loading as default. \nWhen using offline mode you need to update or refresh website to get latest features. \nYou can turn this feature off anytime from settings\n\n Android TV users can turn on or off mouse cursor based on your preference. \n\nIf you are facing issues in video playback please update android system webview.\n\nYou can change these settings anytime from settings menu or back button menu. \n\nPlease don't forget to joim telegram channel for latest updates.\nEnjoy 😊\n\nDo you want to use offline loading?");
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // get the input data and store it in SharedPreferences
-                    String data = input.getText().toString();
-                    String search = "https";
-                    String webqr = ".com";
-                    if (data.toLowerCase().indexOf(search.toLowerCase()) != -1) {
-                        String homestr = data;
-                        SharedPreferences.Editor editor = sharedPref.edit();
-// edit the value of myString
-                        editor.putString("homepage", homestr);
-
-// apply the changes
-                        editor.apply();
-                        Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect  ", Toast.LENGTH_SHORT).show();
-                    }
-                    else if (data.toLowerCase().indexOf(webqr.toLowerCase()) != -1) {
-                        String homestr = ("https://" + data);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-// edit the value of myString
-                        editor.putString("homepage", homestr);
-                        editor.apply();
-                        Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect  ", Toast.LENGTH_SHORT).show();
-// apply the changes
-
-                    }
-                    else {
-                        String homestr = homePage;
-                        SharedPreferences.Editor editor = sharedPref.edit();
-// edit the value of myString
-                        editor.putString("homepage", homestr);
-
-// apply the changes
-                        editor.apply();
-                        Toast.makeText(MainActivity.this, "Entered format is invalid Homepage set to " + homestr + "  Please restart application in order for changes to take effect  ", Toast.LENGTH_SHORT).show();
-                    }
-                    //sharedPref.edit().putString("homepage", data).apply();
-
-                    // set the flag to false so the popup will not show again
+                        Toast.makeText(MainActivity.this, "Offline loading enbled.", Toast.LENGTH_SHORT).show();
+                        sitelist.edit().putBoolean(site1, true ).apply();
+                        sitelist.edit().putBoolean(site2, true ).apply();
+                        sitelist.edit().putBoolean(homePage , true ).apply();
                     sharedPref.edit().putBoolean("isFirstTime", false).apply();
                 }
             });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(MainActivity.this, "Offline loading disabled.", Toast.LENGTH_SHORT).show();
+                    sitelist.edit().putBoolean(site1, false ).apply();
+                     sitelist.edit().putBoolean(site2, false ).apply();
+                     sitelist.edit().putBoolean(homePage , false ).apply();
+                                                   
                     SharedPreferences.Editor editor = sharedPref.edit();
                     sharedPref.edit().putBoolean("isFirstTime", false).apply();
                     editor.apply();
@@ -212,7 +178,8 @@ public class MainActivity extends AppCompatActivity {
         remsavedButton = findViewById(R.id.remsaved_button);
         editButton = findViewById(R.id.edit_button);
         updateButton = findViewById(R.id.update_button);
-        SharedPreferences sitelist = getSharedPreferences ("saved_sites", MODE_PRIVATE);
+        //SharedPreferences sitelist = getSharedPreferences ("saved_sites", MODE_PRIVATE);
+
         homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -231,22 +198,40 @@ public class MainActivity extends AppCompatActivity {
         addsavedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String offsite = webView.getUrl();
-                if (offsite!= null) {
-                    sitelist.edit().putBoolean(offsite, true).apply();
-                    Toast.makeText(MainActivity.this, "Added to offline sites. This website will be loaded in offline mode", Toast.LENGTH_SHORT).show();
+                String offsite0 = webView.getUrl();
+                checkPermission();
+                boolean issitethere = sitelist.getBoolean (offsite0, false);
+                if (issitethere){
+                    Toast.makeText(MainActivity.this, "Website already on offline list",Toast.LENGTH_SHORT).show();
+                    hideView(dialogBack);
+                }else{
+                    
+                  String offsite = webView.getUrl();
+                  if (offsite!= null) {
+                      sitelist.edit().putBoolean(offsite, true).apply();
+                      Toast.makeText(MainActivity.this, "Added to offline sites. This website will be loaded in offline mode", Toast.LENGTH_SHORT).show();
 
+                  }
+                  hideView(dialogBack);
                 }
-                hideView(dialogBack);
             }
         });
         remsavedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String offsite = webView.getUrl();
-                sitelist.edit().putBoolean(offsite, false).apply();
-                Toast.makeText(MainActivity.this, "Removed to offline sites", Toast.LENGTH_SHORT).show();
-                hideView(dialogBack);
+                String offsite1 = webView.getUrl();
+                boolean issitethere1 = sitelist.getBoolean(offsite1, false);
+                if (issitethere1 != false) {
+
+                    if (offsite1 != null) {
+                        sitelist.edit().putBoolean(offsite1, false).apply();
+                        Toast.makeText(MainActivity.this, "Removed from offline sites. ", Toast.LENGTH_SHORT).show();
+
+                    }
+                    hideView(dialogBack);
+                } else {
+                    Toast.makeText(MainActivity.this, "Site wasn't in offline sites. ", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         cursorButton.setOnClickListener(new View.OnClickListener() {
@@ -278,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -623,7 +609,19 @@ public class MainActivity extends AppCompatActivity {
 
         webView.getSettings().setSupportMultipleWindows(false);
         webView.loadUrl(homepge);
-
+        boolean loadsite1 = sitelist.getBoolean (site1, true);
+        if (loadsite1 != false){
+            sitelist.edit().putBoolean(site1, true).apply();
+        }
+        boolean loadsite2 = sitelist.getBoolean (site2, true);
+        if (loadsite2 != false){
+            sitelist.edit().putBoolean(site2, true).apply();
+        }
+        boolean loadsite3 = sitelist.getBoolean (homePage, true);
+        if (loadsite3 != false){
+            sitelist.edit().putBoolean(homePage, true).apply();
+        }
+        
         panelViews = new View[][]{{searchBar, homeButton}, {backButton,forwardButton,cursorButton,refreshButton,editButton ,updateButton, closeButton,addsavedButton,remsavedButton, clearButton}};
         row = 0;
         column = 1;
@@ -932,13 +930,14 @@ public class MainActivity extends AppCompatActivity {
                 dialogEvent(keyCode);
             } else {//Dialog not visible
                 if (nocursor) {
-                    if (keyCode == KeyEvent.KEYCODE_BACK){
-                        dialogBack.setVisibility(View.VISIBLE);
-                        panelViews[row][column].requestFocus();
-
-                    }else{
+                    // return super.dispatchKeyEvent(event);
+                    if (keyCode != KeyEvent.KEYCODE_BACK){
                         return super.dispatchKeyEvent(event);
+                        //dialogBack.setVisibility(View.VISIBLE);
+                        //panelViews[row][column].requestFocus();
+
                     }
+
                 }
 
                 if (event.getAction() == KeyEvent.ACTION_UP) {
@@ -986,7 +985,7 @@ public class MainActivity extends AppCompatActivity {
                             if (!webView.canGoBack()) {
                                 hideView(dialogBack);
                                 // create an array of items to display
-                                CharSequence[] items = {"Exit", "Edit Homepage", "Check Update", "Cancel"};
+                                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage","Enable/Disable offline loading","Check Update", "Cancel"};
 
 // create an alert dialog builder
                                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -1002,6 +1001,14 @@ public class MainActivity extends AppCompatActivity {
                                                 finish();
                                                 break;
                                             case 1:
+                                                webView.clearCache (true);
+                                                Toast.makeText(MainActivity.this, "Cleaned all saved website data. Reload websites to load the latest versions of sites", Toast.LENGTH_SHORT).show();
+                
+                                                hideView(dialogBack);
+                                                // do something for button 4
+                                                break;
+
+                                            case 2:
                                                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                                                 builder.setTitle("Edit Homepage");
                                                 builder.setMessage("Enter new website or webaddress");
@@ -1054,15 +1061,47 @@ public class MainActivity extends AppCompatActivity {
                                                 newdialog.show();
                                                 hideView(dialogBack);
                                                 break;
-                                            case 2:
+                                            case 3:
+                                                SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
+
+                                                boolean site1load = sitelist0.getBoolean (site1, true);
+                                                boolean site2load = sitelist0.getBoolean (site2, true);
+                                                boolean site3load = sitelist0.getBoolean (homePage, true);
+                                                if (site1load == false || site2load == false || site3load == false ){
+                                                    Toast.makeText(MainActivity.this, "Enabled offline loading ", Toast.LENGTH_SHORT).show();
+
+                                                    sitelist0.edit().putBoolean(site1, true ).apply();
+
+
+                                                    sitelist0.edit().putBoolean(site2, true).apply();
+
+                                                    sitelist0.edit().putBoolean(homePage, true).apply();
+                                                    hideView(dialogBack);
+                                                   } 
+                                                else{
+                                                    Toast.makeText(MainActivity.this, "Disabled offline loading ", Toast.LENGTH_SHORT).show();
+
+                                                    sitelist0.edit().putBoolean(site1,false).apply();
+                                                    sitelist0.edit().putBoolean(site2,false).apply();
+
+                                                    sitelist0.edit().putBoolean(homePage,false).apply();
+                                                    hideView(dialogBack);
+                                                }
+                                               
+                                                hideView(dialogBack);
+                                                // do something for button 4
+                                                break;
+                                            case 4:
                                                 webView.loadUrl(sourcecode);
                                                 hideView(dialogBack);
                                                 // do something for button 3
                                                 break;
-                                            case 3:
+                                                
+                                            case 5:
                                                 hideView(dialogBack);
                                                 // do something for button 4
                                                 break;
+                                            
                                         }
                                     }
                                 });
