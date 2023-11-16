@@ -450,17 +450,33 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         webSettings.setAllowUniversalAccessFromFileURLs(true);
         webSettings.setJavaScriptEnabled(true);
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        //webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         webSettings.setDatabaseEnabled(true);
         webSettings.setDomStorageEnabled(true);
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setLoadWithOverviewMode(true);
+        
 
         // enable JavaScript
         webSettings.setJavaScriptEnabled(true);
         // enable web storage
-        webSettings.setDomStorageEnabled(true);
+        webSettings.setDomStorageEnabled(true)
+        SharedPreferences sitelist = getSharedPreferences (“saved_sites”, MODE_PRIVATE); // get a SharedPreferences object with the name “saved_sites”
+
+        String url = homepge; 
+    // the URL of the site you want toad boolean 
+        isSaved = sharedPreferences.getBoolean (url, false); // check if the site is in the list
+
+if (isSaved) { // if the site is in the list, set the cache mode to load from cache only 
+    webSettings.setCacheMode (WebSettings.LOAD_CACHE_ONLY);
+    webView.loadUrl (url);
+} else { // if the site is not in the list, set the cache mode to load from network only 
+    webSettings.setCacheMode (WebSettings.LOAD_NO_CACHE); 
+    webView.loadUrl (url);
+}
+
+         // load the site in the WebView
         webView.setOnLongClickListener(v -> {
             String url = null, imageUrl = null;
             WebView.HitTestResult r = ((WebView) v).getHitTestResult();
@@ -521,13 +537,7 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         });
 
-        if (savedInstanceState != null) {
-            webView.restoreState(savedInstanceState);
-        }else{
-            webView.loadUrl(homepge);
-        }
-
-        webView.getSettings().setJavaScriptEnabled(true);
+    
 
 // Set a webview client to the webview
         webView.setWebViewClient(new WebViewClient() {
