@@ -16,7 +16,9 @@
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
         android:focusable="false"
-        android:focusableInTouchMode="true" />
+        android:focusableInTouchMode="true" >
+
+    </WebView>
     <ImageView
         android:id="@+id/mouse_pointer"
         android:layout_width="30dp"
@@ -40,12 +42,12 @@
         android:background="@color/colorHalfTransparentBlack"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <RelativeLayout
             android:id="@+id/dialog_panel"
-            android:layout_width="430dp"
-            android:layout_height="200dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:focusable="false"
             android:focusableInTouchMode="false"
@@ -71,6 +73,15 @@
 
             </EditText>
 
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/divider3"
+                android:text="   Offline Pages"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="#AEACAC" />
 
             <ImageButton
                 android:id="@+id/home_button"
@@ -175,6 +186,55 @@
                 android:focusableInTouchMode="true"
                 android:src="@drawable/ic_close" />
 
+
+            <View
+                android:id="@+id/divider3"
+                android:layout_width="0dp"
+                android:layout_height="5dp"
+                android:layout_below="@+id/back_button"
+                android:background="?android:attr/listDivider"
+                android:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/addsaved_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/textView"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/button_default_background"
+                android:contentDescription="Add to offline pages"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:src="@drawable/ic_save" />
+
+            <ImageButton
+                android:id="@+id/remsaved_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/textView"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@id/addsaved_button"
+                android:background="@drawable/button_default_background"
+                android:contentDescription="remove from offline pages"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:src="@drawable/ic_remsave" />
+
+            <ImageButton
+                android:id="@+id/clear_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/textView"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@id/remsaved_button"
+                android:background="@drawable/button_default_background"
+                android:contentDescription="Close"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:src="@drawable/ic_updatesite" />
 
         </RelativeLayout>
 

@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText searchBar ;
     private RelativeLayout frame,dialogBack;
     private boolean firstDown = true;
-    private ImageButton homeButton,forwardButton,backButton,refreshButton, editButton, closeButton, updateButton, cursorButton;
+    private ImageButton homeButton,forwardButton,backButton,refreshButton, editButton, closeButton, updateButton, cursorButton,remsavedButton,addsavedButton,clearButton;
     private View[][] panelViews ;
 
     static final int PERMISSION_REQUEST_DOWNLOAD = 3;
@@ -208,8 +208,11 @@ public class MainActivity extends AppCompatActivity {
 
         closeButton = findViewById(R.id.close_button);
         clearButton = findViewById(R.id.clear_button);
+        addsavedButton = findViewById(R.id.addsaved_button);
+        remsavedButton = findViewById(R.id.remsaved_button);
         editButton = findViewById(R.id.edit_button);
         updateButton = findViewById(R.id.update_button);
+        SharedPreferences sitelist = getSharedPreferences ("saved_sites", MODE_PRIVATE);
         homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,7 +224,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 webView.clearCache (true);
-                Toast.makeText(MainActivity.this, "Cleaned all saved website data. Reload websites to load the latest versions of sites", Toast.LENGTH_SHORT).show(); 
+                Toast.makeText(MainActivity.this, "Cleaned all saved website data. Reload websites to load the latest versions of sites", Toast.LENGTH_SHORT).show();
+                hideView(dialogBack);
+            }
+        });
+        addsavedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String offsite = webView.getUrl();
+                if (offsite!= null) {
+                    sitelist.edit().putBoolean(offsite, true).apply();
+                    Toast.makeText(MainActivity.this, "Added to offline sites. This website will be loaded in offline mode", Toast.LENGTH_SHORT).show();
+
+                }
+                hideView(dialogBack);
+            }
+        });
+        remsavedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String offsite = webView.getUrl();
+                sitelist.edit().putBoolean(offsite, false).apply();
+                Toast.makeText(MainActivity.this, "Removed to offline sites", Toast.LENGTH_SHORT).show();
                 hideView(dialogBack);
             }
         });
@@ -235,11 +259,11 @@ public class MainActivity extends AppCompatActivity {
                     nocursor = false;
                     Toast.makeText(MainActivity.this, "Mouse Cursor Enabled", Toast.LENGTH_SHORT).show();
                     cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background_def));
-                    hideView(dialogBack)
+                    hideView(dialogBack);
                     SharedPreferences.Editor editor = sharedPref.edit();
                     sharedPref.edit().putBoolean("nocursor", false).apply();
                     editor.apply();
-                    
+
                 }
                 else{
                     nocursor = true;
@@ -249,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = sharedPref.edit();
                     sharedPref.edit().putBoolean("nocursor", true).apply();
                     editor.apply();
-                    
+
                 }
 
             }
@@ -449,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         webView = findViewById(R.id.web_view);
-        
+
 
         ProgressBar loadingIndicator = findViewById(R.id.loading_indicator);
         webView.setWebViewClient(browser = new Browser(searchBar,webView));
@@ -465,17 +489,18 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setLoadWithOverviewMode(true);
-        
+
 
         // enable JavaScript
         webSettings.setJavaScriptEnabled(true);
         // enable web storage
-        webSettings.setDomStorageEnabled(true)
-        SharedPreferences sitelist = getSharedPreferences (“saved_sites”, MODE_PRIVATE); // get a SharedPreferences object with the name “saved_sites”
+        webSettings.setDomStorageEnabled(true);
 
-        
+        // get a SharedPreferences object with the name “saved_sites”
 
-         // load the site in the WebView
+
+
+        // load the site in the WebView
         webView.setOnLongClickListener(v -> {
             String url = null, imageUrl = null;
             WebView.HitTestResult r = ((WebView) v).getHitTestResult();
@@ -536,8 +561,8 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         });
 
-    
-        SharedPreferences sitelist = getSharedPreferences ("saved_sites", MODE_PRIVATE);
+
+
 // Set a webview client to the webview
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -556,22 +581,22 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-             public boolean shouldOverrideUrlLoading (WebView view, String url) {
-    // check if the URL is in the saved sites list
+            public boolean shouldOverrideUrlLoading (WebView view, String url) {
+                // check if the URL is in the saved sites list
                 boolean isSaved = sitelist.getBoolean (url, false);
 
-    // set the cache mode according to the URL's status in the list
+                // set the cache mode according to the URL's status in the list
                 if (isSaved) {
-      // if the URL is in the list, set the cache mode to load from cache only
+                    // if the URL is in the list, set the cache mode to load from cache only
                     webSettings.setCacheMode (WebSettings.LOAD_CACHE_ONLY);
-               } else {
-      // if the URL is not in the list, set the cache mode to load from network only
+                } else {
+                    // if the URL is not in the list, set the cache mode to load from network only
                     webSettings.setCacheMode (WebSettings.LOAD_NO_CACHE);
-                 }
+                }
 
-    // return false to let the WebView load the URL
-                  return false;
-  }
+                // return false to let the WebView load the URL
+                return false;
+            }
 
 
 
@@ -599,7 +624,7 @@ public class MainActivity extends AppCompatActivity {
         webView.getSettings().setSupportMultipleWindows(false);
         webView.loadUrl(homepge);
 
-        panelViews = new View[][]{{searchBar, homeButton}, {backButton,forwardButton,cursorButton,refreshButton,editButton ,updateButton, closeButton}};
+        panelViews = new View[][]{{searchBar, homeButton}, {backButton,forwardButton,cursorButton,refreshButton,editButton ,updateButton, closeButton,addsavedButton,remsavedButton, clearButton}};
         row = 0;
         column = 1;
         panelViews[row][column].setFocusable(true);
@@ -774,7 +799,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }else if(row == 1){
                     if(column == 0){
-                        column = 6;
+                        column = 9;
                     }else{
                         column --;
                     }
@@ -788,7 +813,7 @@ public class MainActivity extends AppCompatActivity {
                         column ++;
                     }
                 }else if(row == 1){
-                    if(column == 6){
+                    if(column == 9){
                         column = 0;
                     }else{
                         column ++;
@@ -806,14 +831,14 @@ public class MainActivity extends AppCompatActivity {
                 panelViews[rowTemp][columnTemp].setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.search_bar_background));
             }else{
                 panelViews[rowTemp][columnTemp].setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.voice_button_background_default));
-                    
+
             }
         }else {
             panelViews[rowTemp][columnTemp].setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.button_default_background));
-                    if (nocursor) {
-            cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+            if (nocursor) {
+                cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
 
-        }
+            }
         }
         if(row == 0 ){
             if(column == 0) {
@@ -823,10 +848,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }else {
             panelViews[row][column].setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.button_focus_background));
-                    if (nocursor) {
-            cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+            if (nocursor) {
+                cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
 
-        }
+            }
         }
     }
     public void dialogEvent(int keyCode){
@@ -914,7 +939,7 @@ public class MainActivity extends AppCompatActivity {
                     }else{
                         return super.dispatchKeyEvent(event);
                     }
-                    }
+                }
 
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     if (pointerMoveTimer != null) {
@@ -1054,8 +1079,8 @@ public class MainActivity extends AppCompatActivity {
                         if (webClient.isFullScreen()) {
                             webClient.onHideCustomView();
                         } else {
-                           // if (nocursor) {
-                              //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+                            // if (nocursor) {
+                            //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
 
                             //}
                             dialogBack.setVisibility(View.VISIBLE);
