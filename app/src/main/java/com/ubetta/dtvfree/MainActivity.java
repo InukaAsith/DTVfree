@@ -207,12 +207,21 @@ public class MainActivity extends AppCompatActivity {
         }
 
         closeButton = findViewById(R.id.close_button);
+        clearButton = findViewById(R.id.clear_button);
         editButton = findViewById(R.id.edit_button);
         updateButton = findViewById(R.id.update_button);
         homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 webView.loadUrl(homepge);
+                hideView(dialogBack);
+            }
+        });
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                webView.clearCache (true);
+                Toast.makeText(MainActivity.this, "Cleaned all saved website data. Reload websites to load the latest versions of sites", Toast.LENGTH_SHORT).show(); 
                 hideView(dialogBack);
             }
         });
@@ -464,17 +473,7 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setDomStorageEnabled(true)
         SharedPreferences sitelist = getSharedPreferences (“saved_sites”, MODE_PRIVATE); // get a SharedPreferences object with the name “saved_sites”
 
-        String url = homepge; 
-    // the URL of the site you want toad boolean 
-        isSaved = sharedPreferences.getBoolean (url, false); // check if the site is in the list
-
-if (isSaved) { // if the site is in the list, set the cache mode to load from cache only 
-    webSettings.setCacheMode (WebSettings.LOAD_CACHE_ONLY);
-    webView.loadUrl (url);
-} else { // if the site is not in the list, set the cache mode to load from network only 
-    webSettings.setCacheMode (WebSettings.LOAD_NO_CACHE); 
-    webView.loadUrl (url);
-}
+        
 
          // load the site in the WebView
         webView.setOnLongClickListener(v -> {
@@ -538,7 +537,7 @@ if (isSaved) { // if the site is in the list, set the cache mode to load from ca
         });
 
     
-
+        SharedPreferences sitelist = getSharedPreferences ("saved_sites", MODE_PRIVATE);
 // Set a webview client to the webview
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -556,7 +555,23 @@ if (isSaved) { // if the site is in the list, set the cache mode to load from ca
                 searchBar.setHint(webView.getUrl());
             }
 
+            @Override
+             public boolean shouldOverrideUrlLoading (WebView view, String url) {
+    // check if the URL is in the saved sites list
+                boolean isSaved = sitelist.getBoolean (url, false);
 
+    // set the cache mode according to the URL's status in the list
+                if (isSaved) {
+      // if the URL is in the list, set the cache mode to load from cache only
+                    webSettings.setCacheMode (WebSettings.LOAD_CACHE_ONLY);
+               } else {
+      // if the URL is not in the list, set the cache mode to load from network only
+                    webSettings.setCacheMode (WebSettings.LOAD_NO_CACHE);
+                 }
+
+    // return false to let the WebView load the URL
+                  return false;
+  }
 
 
 
@@ -582,7 +597,7 @@ if (isSaved) { // if the site is in the list, set the cache mode to load from ca
         });
 
         webView.getSettings().setSupportMultipleWindows(false);
-
+        webView.loadUrl(homepge);
 
         panelViews = new View[][]{{searchBar, homeButton}, {backButton,forwardButton,cursorButton,refreshButton,editButton ,updateButton, closeButton}};
         row = 0;
