@@ -15,6 +15,7 @@ public class WebClient extends WebChromeClient {
     private int mOriginalSystemUiVisibility;
     private MainActivity mainActivity;
     private boolean fullScreen = false;
+    private boolean isVideoFullScreen = false;
 
     // Add a Bundle variable to store the state of the webview
 
@@ -36,6 +37,7 @@ public class WebClient extends WebChromeClient {
 
     public void onHideCustomView() {
         fullScreen = false;
+        isVideoFullScreen = false;
         ((FrameLayout) mainActivity.getWindow().getDecorView()).removeView(this.mCustomView);
         this.mCustomView = null;
         mainActivity.getWindow().getDecorView().setSystemUiVisibility(this.mOriginalSystemUiVisibility);
@@ -50,6 +52,7 @@ public class WebClient extends WebChromeClient {
             onHideCustomView();
             return;
         }
+
         this.mCustomView = paramView;
         this.mOriginalSystemUiVisibility = mainActivity.getWindow().getDecorView().getSystemUiVisibility();
         this.mOriginalOrientation = mainActivity.getRequestedOrientation();
@@ -62,6 +65,7 @@ public class WebClient extends WebChromeClient {
 
         // If the device is not an Android TV, hide the status bar and the navigation bar
         if (!isTV) {
+            isVideoFullScreen = true;
             mainActivity.getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -69,9 +73,19 @@ public class WebClient extends WebChromeClient {
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE);
-        } else {            
+        } else {
+            isVideoFullScreen = false;
             mainActivity.getWindow().getDecorView().setSystemUiVisibility(3846);
             this.mCustomViewCallback.onCustomViewHidden();
         }
     }
-}
+
+    // Define a getter method for the isVideoFullScreen variable
+    public boolean isVideoFullScreen() {
+        return isVideoFullScreen;
+    }
+    }
+
+
+
+

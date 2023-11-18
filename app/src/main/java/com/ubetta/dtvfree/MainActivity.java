@@ -6,6 +6,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 
 import android.app.DownloadManager;
+import android.app.PictureInPictureParams;
 import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
@@ -22,6 +23,7 @@ import android.graphics.Bitmap;
 
 import android.net.Uri;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
@@ -33,6 +35,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 
+import android.util.Rational;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -134,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         if (isFirstTime) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Welcome Back");
-            builder.setMessage("Thanks for installing application. 🎉 \n\nData Free TV" + version + "\nCurrent Homepage:" + homepge + "\n\nFor faster performance and reduced data usage applications to uses offline webpage loading as default. \nWhen using offline mode you need to update or refresh website to get latest features. \nYou can turn this feature off anytime from settings\n\n Android TV users can turn on or off mouse cursor based on your preference. \n\nIf you are facing issues in video playback please update android system webview.\n\nYou can change these settings anytime from settings menu or back button menu. \n\nPlease don't forget to joim telegram channel for latest updates.\nEnjoy 😊\n\nDo you want to use offline loading?");
+            builder.setMessage("Thanks for installing application. 🎉 \n\nData Free TV" + version + "\nCurrent Homepage:" + homepge + "\n\nFor faster performance and reduced data usage this application uses offline webpage loading as default. \nWhen using offline mode you need to update or refresh website to get latest features. \n\n Android TV users can turn on or off mouse cursor based on your preference. \n\nIf you want to use background video playback (Pip mode) please allow display over other apps permission from Settings.\n\nYou can change these settings anytime from settings menu or back button menu. \n\nPlease don't forget to join telegram channel for latest updates.\nEnjoy 😊\n\nDo you want to use offline loading?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -574,10 +577,10 @@ public class MainActivity extends AppCompatActivity {
                 // set the cache mode according to the URL's status in the list
                 if (isSaved) {
                     // if the URL is in the list, set the cache mode to load from cache only
-                    webSettings.setCacheMode (WebSettings.LOAD_CACHE_ONLY);
+                    webSettings.setCacheMode (WebSettings.LOAD_CACHE_ELSE_NETWORK);
                 } else {
                     // if the URL is not in the list, set the cache mode to load from network only
-                    webSettings.setCacheMode (WebSettings.LOAD_NO_CACHE);
+                    webSettings.setCacheMode (WebSettings.LOAD_DEFAULT);
                 }
 
                 // return false to let the WebView load the URL
@@ -768,6 +771,44 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
+
+        // Hide or show the WebView controls based on the PIP mode
+        if (isInPictureInPictureMode) {
+            // Hide the controls in PIP mode
+            webView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        } else {
+            // Show the controls in normal mode
+            webView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        }
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
+        boolean pipm = pipmode.getBoolean ("pip", false);
+        if (pipm == true){
+        // Enter PIP mode when the user leaves the app and the webview is showing a video in full screen mode
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && webClient.isVideoFullScreen()) {
+              enterPictureInPictureMode(new PictureInPictureParams.Builder()
+                      .setAspectRatio(new Rational(16, 9)) // Set the aspect ratio for the PIP window
+                      .build());
+          }
+    }
+    }
+
+
+
+    
     @Override
     public void onWindowFocusChanged(boolean hasFocus){
         screenWidth = webView.getWidth();
@@ -985,7 +1026,7 @@ public class MainActivity extends AppCompatActivity {
                             if (!webView.canGoBack()) {
                                 hideView(dialogBack);
                                 // create an array of items to display
-                                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage","Enable/Disable offline loading","Check Update", "Cancel"};
+                                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage","Enable/Disable offline loading","Enable/Disable Background Play","Check Update", "Cancel"};
 
 // create an alert dialog builder
                                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -1061,6 +1102,7 @@ public class MainActivity extends AppCompatActivity {
                                                 newdialog.show();
                                                 hideView(dialogBack);
                                                 break;
+
                                             case 3:
                                                 SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
 
@@ -1091,13 +1133,32 @@ public class MainActivity extends AppCompatActivity {
                                                 hideView(dialogBack);
                                                 // do something for button 4
                                                 break;
-                                            case 4:
+                                             case 4:
+                                                SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
+
+                                                boolean pipm = pipmode.getBoolean ("pip", false);
+                                                if (pipm == true){
+                                                    pipmode.edit().putBoolean("pip", false ).apply();
+                                                    Toast.makeText(MainActivity.this, "Disabled Background Play", Toast.LENGTH_SHORT).show();
+
+                                                }else{
+                                                    pipmode.edit().putBoolean("pip", true ).apply();
+                                                    Toast.makeText(MainActivity.this, "Enabled background play", Toast.LENGTH_SHORT).show();
+
+                                                }
+
+                                                hideView(dialogBack);
+                                                // do something for button 4
+                                                break;
+
+                                                
+                                            case 5:
                                                 webView.loadUrl(sourcecode);
                                                 hideView(dialogBack);
                                                 // do something for button 3
                                                 break;
                                                 
-                                            case 5:
+                                            case 6:
                                                 hideView(dialogBack);
                                                 // do something for button 4
                                                 break;
