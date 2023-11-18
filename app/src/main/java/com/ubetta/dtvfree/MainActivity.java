@@ -99,10 +99,10 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_REQUEST_DOWNLOAD);
         }
     }
-    private String homePage = "https://datafreetv.live/";
+    private String homePage = "https://google.com/";
 
-    private String site1 = "https://datafreetv.live/dtv.html";
-    private String site2 = "https://datafreetv.live/peotvgo.html";
+    private String site1 = "https://google.com/search=q?";
+    private String site2 = "https://google.com/search";
     private boolean nocursor = false;
     private String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
     private String version = "v4.2.1";
