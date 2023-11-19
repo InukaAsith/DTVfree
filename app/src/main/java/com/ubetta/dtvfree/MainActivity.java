@@ -1024,7 +1024,7 @@ public class MainActivity extends AppCompatActivity {
                         // If the device is not an Android TV, hide the status bar and the navigation bar
                         if (!isTV) {
                             if (!webView.canGoBack()) {
-                                hideView(dialogBack);
+                                //hideView(dialogBack);
                                 // create an array of items to display
                                 CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage","Enable/Disable offline loading","Enable/Disable Background Play","Check Update", "Cancel"};
 
@@ -1170,6 +1170,8 @@ public class MainActivity extends AppCompatActivity {
 // create and show the dialog
                                 AlertDialog dialog = builder.create();
                                 dialog.show();
+                                hideView(dialogBack);
+                                break;
 
                             } else {
                                 webView.goBack();
