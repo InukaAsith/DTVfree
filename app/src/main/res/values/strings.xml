@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Data Free TV</string>
+    <string name="app_name">DTVFree</string>
     <string name="refresh_button">refresh button</string>
     <string name="back_button">back button</string>
     <string name="forward_button">forward button</string>
