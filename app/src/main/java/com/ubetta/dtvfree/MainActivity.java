@@ -99,10 +99,10 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_REQUEST_DOWNLOAD);
         }
     }
-    private String homePage = "https://datafreetv.live/";
+    private String homePage = "https://google.com/";
 
-    private String site1 = "https://datafreetv.live/dtv.html";
-    private String site2 = "https://datafreetv.live/peotvgo.html";
+    private String site1 = "https://www.google.com/search?q";
+    private String site2 = "https://google.com/search?q";
     private boolean nocursor = false;
     private String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
     private String version = "v4.2.1";
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         if (isFirstTime) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Welcome Back");
-            builder.setMessage("Thanks for installing application. 🎉 \n\nData Free TV" + version + "\nCurrent Homepage:" + homepge + "\n\nFor faster performance and reduced data usage this application uses offline webpage loading as default. \nWhen using offline mode you need to update or refresh website to get latest features. \n\n Android TV users can turn on or off mouse cursor based on your preference. \n\nIf you want to use background video playback (Pip mode) please allow display over other apps permission from Settings.\n\nYou can change these settings anytime from settings menu or back button menu. \n\nPlease don't forget to join telegram channel for latest updates.\nEnjoy 😊\n\nDo you want to use offline loading?");
+            builder.setMessage("Thanks for installing application. 🎉 \n\nDream TV" + version + "\nCurrent Homepage:" + homepge + "\n\nFor faster performance and reduced data usage this application uses offline webpage loading as default. \nWhen using offline mode you need to update or refresh website to get latest features. \n\n Android TV users can turn on or off mouse cursor based on your preference. \n\nIf you want to use background video playback (Pip mode) please allow display over other apps permission from Settings.\n\nYou can change these settings anytime from settings menu or back button menu. \n\nPlease don't forget to join telegram channel for latest updates.\nEnjoy 😊\n\nDo you want to use offline loading?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
