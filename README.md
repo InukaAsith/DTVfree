@@ -10,20 +10,33 @@
 - Downoad Support
 - Custom Homepage
 - Cursor support
+- Turn on off cursor 
 - login support
 - Cross platform
 - Google search
 - Media playback support
 - Streaming Support
 - Minimun system impact
+- Offline caching support
 
 ### License
 
 This project is licensed under the MIT License.
 
-### Please Note ⚠️
+### Please Note 
 
-If you are seeing forbidden when opening application it means you need to set your homepage to some site like google.com . Default website only works in Sri Lanka
+This app also works on android Mobile. But url bar is not yet implemented. So you only can set a homepage from settings menu then the app will load that site
+
+### Don't be stupid 🍌
+
+this is a web browser so if you have any problems with sites app loads contact responsible owner of those websites.
+If you have any issues with functionality of this app feel free to drop a mail
+
+
+### Disclaimer ⚠️
+
+DreamTV is a web browser, Websites and content accessed through this app is belongs to website authors.
+DreamTVfree app or developer does not hold any accountability for any of that
 
 ## Credits
 
