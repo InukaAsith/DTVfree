@@ -15,10 +15,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="-51dp"
         android:focusable="false"
-        android:focusableInTouchMode="true" >
+        android:focusableInTouchMode="true">
 
     </WebView>
+
+    <ImageButton
+        android:id="@+id/fab"
+        android:layout_width="70dp"
+        android:layout_height="67dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/settings_button_background_default"
+        android:contentDescription="Home Button"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:src="@drawable/ic_settings"
+        android:visibility="gone"
+        tools:ignore="DuplicateClickableBoundsCheck" />
+
+
+
+
     <ImageView
         android:id="@+id/mouse_pointer"
         android:layout_width="30dp"

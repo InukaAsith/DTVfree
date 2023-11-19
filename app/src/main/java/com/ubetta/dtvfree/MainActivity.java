@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText searchBar ;
     private RelativeLayout frame,dialogBack;
     private boolean firstDown = true;
-    private ImageButton homeButton,forwardButton,backButton,refreshButton, editButton, closeButton, updateButton, cursorButton,remsavedButton,addsavedButton,clearButton;
+    private ImageButton fab, homeButton,forwardButton,backButton,refreshButton, editButton, closeButton, updateButton, cursorButton,remsavedButton,addsavedButton,clearButton;
     private View[][] panelViews ;
 
     static final int PERMISSION_REQUEST_DOWNLOAD = 3;
@@ -141,10 +141,10 @@ public class MainActivity extends AppCompatActivity {
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this, "Offline loading enbled.", Toast.LENGTH_SHORT).show();
-                        sitelist.edit().putBoolean(site1, true ).apply();
-                        sitelist.edit().putBoolean(site2, true ).apply();
-                        sitelist.edit().putBoolean(homePage , true ).apply();
+                    Toast.makeText(MainActivity.this, "Offline loading enbled.", Toast.LENGTH_SHORT).show();
+                    sitelist.edit().putBoolean(site1, true ).apply();
+                    sitelist.edit().putBoolean(site2, true ).apply();
+                    sitelist.edit().putBoolean(homePage , true ).apply();
                     sharedPref.edit().putBoolean("isFirstTime", false).apply();
                 }
             });
@@ -153,9 +153,9 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     Toast.makeText(MainActivity.this, "Offline loading disabled.", Toast.LENGTH_SHORT).show();
                     sitelist.edit().putBoolean(site1, false ).apply();
-                     sitelist.edit().putBoolean(site2, false ).apply();
-                     sitelist.edit().putBoolean(homePage , false ).apply();
-                                                   
+                    sitelist.edit().putBoolean(site2, false ).apply();
+                    sitelist.edit().putBoolean(homePage , false ).apply();
+
                     SharedPreferences.Editor editor = sharedPref.edit();
                     sharedPref.edit().putBoolean("isFirstTime", false).apply();
                     editor.apply();
@@ -208,14 +208,14 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Website already on offline list",Toast.LENGTH_SHORT).show();
                     hideView(dialogBack);
                 }else{
-                    
-                  String offsite = webView.getUrl();
-                  if (offsite!= null) {
-                      sitelist.edit().putBoolean(offsite, true).apply();
-                      Toast.makeText(MainActivity.this, "Added to offline sites. This website will be loaded in offline mode", Toast.LENGTH_SHORT).show();
 
-                  }
-                  hideView(dialogBack);
+                    String offsite = webView.getUrl();
+                    if (offsite!= null) {
+                        sitelist.edit().putBoolean(offsite, true).apply();
+                        Toast.makeText(MainActivity.this, "Added to offline sites. This website will be loaded in offline mode", Toast.LENGTH_SHORT).show();
+
+                    }
+                    hideView(dialogBack);
                 }
             }
         });
@@ -383,6 +383,162 @@ public class MainActivity extends AppCompatActivity {
         backButton = findViewById(R.id.back_button);
         forwardButton = findViewById(R.id.forward_button);
         refreshButton = findViewById(R.id.refresh_button);
+        fab =  findViewById(R.id.fab);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage","Enable/Disable offline loading","Enable/Disable Background Play","Check Update", "Cancel"};
+
+// create an alert dialog builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Settings");
+
+// add the items to the dialog
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                finish();
+                                break;
+                            case 1:
+                                webView.clearCache (true);
+                                Toast.makeText(MainActivity.this, "Cleaned all saved website data. Reload websites to load the latest versions of sites", Toast.LENGTH_SHORT).show();
+
+                                hideView(dialogBack);
+                                // do something for button 4
+                                break;
+
+                            case 2:
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                builder.setTitle("Edit Homepage");
+                                builder.setMessage("Enter new website or webaddress");
+                                final EditText input = new EditText(MainActivity.this);
+                                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                                input.setHint("Enter new website or webaddress");
+                                builder.setView(input);
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // get the input value from the EditText object
+                                        String value = input.getText().toString();
+                                        String search = "https";
+                                        String webqr = ".com";
+
+                                        if (value.toLowerCase().indexOf(search.toLowerCase()) != -1) {
+                                            String homestr = value;
+                                            SharedPreferences.Editor editor = sharedPref.edit();
+                                            editor.putString("homepage", homestr);
+                                            editor.apply();
+                                            Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect", Toast.LENGTH_SHORT).show();
+                                        }
+                                        else if (value.toLowerCase().indexOf(webqr.toLowerCase()) != -1) {
+                                            String homestr = ("https://" + value);
+                                            SharedPreferences.Editor editor = sharedPref.edit();
+                                            editor.putString("homepage", homestr);
+                                            editor.apply();
+                                            Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect", Toast.LENGTH_SHORT).show();
+
+                                        }
+                                        else {
+                                            String homestr = homePage;
+                                            SharedPreferences.Editor editor = sharedPref.edit();
+                                            editor.putString("homepage", homestr);
+                                            editor.apply();
+                                            Toast.makeText(MainActivity.this, "Entered format is invalid Homepage set to " + homestr + "  Please restart application in order for changes to take effect  ", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // cancel the dialog
+                                        dialog.cancel();
+                                    }
+                                });
+
+// create and show the AlertDialog object from the AlertDialog.Builder object
+                                AlertDialog newdialog = builder.create();
+                                newdialog.show();
+                                hideView(dialogBack);
+                                break;
+
+                            case 3:
+                                SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
+
+                                boolean site1load = sitelist0.getBoolean (site1, true);
+                                boolean site2load = sitelist0.getBoolean (site2, true);
+                                boolean site3load = sitelist0.getBoolean (homePage, true);
+                                if (site1load == false || site2load == false || site3load == false ){
+                                    Toast.makeText(MainActivity.this, "Enabled offline loading ", Toast.LENGTH_SHORT).show();
+
+                                    sitelist0.edit().putBoolean(site1, true ).apply();
+
+
+                                    sitelist0.edit().putBoolean(site2, true).apply();
+
+                                    sitelist0.edit().putBoolean(homePage, true).apply();
+                                    hideView(dialogBack);
+                                }
+                                else{
+                                    Toast.makeText(MainActivity.this, "Disabled offline loading ", Toast.LENGTH_SHORT).show();
+
+                                    sitelist0.edit().putBoolean(site1,false).apply();
+                                    sitelist0.edit().putBoolean(site2,false).apply();
+
+                                    sitelist0.edit().putBoolean(homePage,false).apply();
+                                    hideView(dialogBack);
+                                }
+
+                                hideView(dialogBack);
+                                // do something for button 4
+                                break;
+                            case 4:
+                                SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
+
+                                boolean pipm = pipmode.getBoolean ("pip", false);
+                                if (pipm == true){
+                                    pipmode.edit().putBoolean("pip", false ).apply();
+                                    Toast.makeText(MainActivity.this, "Disabled Background Play", Toast.LENGTH_SHORT).show();
+
+                                }else{
+                                    pipmode.edit().putBoolean("pip", true ).apply();
+                                    Toast.makeText(MainActivity.this, "Enabled background play", Toast.LENGTH_SHORT).show();
+
+                                }
+
+                                hideView(dialogBack);
+                                // do something for button 4
+                                break;
+
+
+                            case 5:
+                                webView.loadUrl(sourcecode);
+                                hideView(dialogBack);
+                                // do something for button 3
+                                break;
+
+                            case 6:
+                                hideView(dialogBack);
+                                // do something for button 4
+                                break;
+
+
+                    }
+
+                }
+                    });
+                AlertDialog dialog1 = builder.create();
+                dialog1.show();
+                }
+
+        });
+
+
+
+
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -472,6 +628,9 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         webSettings.setAllowUniversalAccessFromFileURLs(true);
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        //webSettings.setPluginState(WebSettings.PluginState.ON);
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
         //webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         webSettings.setDatabaseEnabled(true);
         webSettings.setDomStorageEnabled(true);
@@ -479,11 +638,6 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setDisplayZoomControls(false);
         webSettings.setLoadWithOverviewMode(true);
 
-
-        // enable JavaScript
-        webSettings.setJavaScriptEnabled(true);
-        // enable web storage
-        webSettings.setDomStorageEnabled(true);
 
         // get a SharedPreferences object with the name “saved_sites”
 
@@ -558,7 +712,20 @@ public class MainActivity extends AppCompatActivity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 // Show the loading indicator when the webview starts loading
                 loadingIndicator.setVisibility(View.VISIBLE);
+                PackageManager pm = getPackageManager();
+
+                // Check if the device is an Android TV
+                boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
+                if (!isTV) {
+                    if (url.equals(homepge)) {
+                        fab.setVisibility(View.VISIBLE);
+                    } else {
+                        //Otherwise, hide the FAB
+                        fab.setVisibility(View.GONE);
+                    }
+                }
                 super.onPageStarted(view, url, favicon);
+
             }
 
             @Override
@@ -567,6 +734,20 @@ public class MainActivity extends AppCompatActivity {
                 loadingIndicator.setVisibility(View.GONE);
                 super.onPageFinished(view, url);
                 searchBar.setHint(webView.getUrl());
+                PackageManager pm = getPackageManager();
+
+                // Check if the device is an Android TV
+                boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
+
+                // If the device is not an Android TV, hide the status bar and the navigation bar
+                if (!isTV) {
+                    if (url.equals(homepge)) {
+                        fab.setVisibility(View.VISIBLE);
+                    } else {
+                        //Otherwise, hide the FAB
+                        fab.setVisibility(View.GONE);
+                    }
+                }
             }
 
             @Override
@@ -624,7 +805,7 @@ public class MainActivity extends AppCompatActivity {
         if (loadsite3 != false){
             sitelist.edit().putBoolean(homePage, true).apply();
         }
-        
+
         panelViews = new View[][]{{searchBar, homeButton}, {backButton,forwardButton,cursorButton,refreshButton,editButton ,updateButton, closeButton,addsavedButton,remsavedButton, clearButton}};
         row = 0;
         column = 1;
@@ -797,18 +978,18 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
         boolean pipm = pipmode.getBoolean ("pip", false);
         if (pipm == true){
-        // Enter PIP mode when the user leaves the app and the webview is showing a video in full screen mode
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && webClient.isVideoFullScreen()) {
-              enterPictureInPictureMode(new PictureInPictureParams.Builder()
-                      .setAspectRatio(new Rational(16, 9)) // Set the aspect ratio for the PIP window
-                      .build());
-          }
+            // Enter PIP mode when the user leaves the app and the webview is showing a video in full screen mode
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && webClient.isVideoFullScreen()) {
+                enterPictureInPictureMode(new PictureInPictureParams.Builder()
+                        .setAspectRatio(new Rational(16, 9)) // Set the aspect ratio for the PIP window
+                        .build());
+            }
+        }
     }
-    }
 
 
 
-    
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus){
         screenWidth = webView.getWidth();
@@ -1024,152 +1205,29 @@ public class MainActivity extends AppCompatActivity {
                         // If the device is not an Android TV, hide the status bar and the navigation bar
                         if (!isTV) {
                             if (!webView.canGoBack()) {
-                                hideView(dialogBack);
+                                //hideView(dialogBack);
                                 // create an array of items to display
-                                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage","Enable/Disable offline loading","Enable/Disable Background Play","Check Update", "Cancel"};
-
-// create an alert dialog builder
-                                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                                builder.setTitle("Exitting Application");
-
-// add the items to the dialog
-                                builder.setItems(items, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // handle the click event of each item
-                                        switch (which) {
-                                            case 0:
+                                new AlertDialog.Builder(this)
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .setTitle("Closing Application")
+                                        .setMessage("Are you sure you want to close this application?")
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // call the finish method to end the activity
                                                 finish();
-                                                break;
-                                            case 1:
-                                                webView.clearCache (true);
-                                                Toast.makeText(MainActivity.this, "Cleaned all saved website data. Reload websites to load the latest versions of sites", Toast.LENGTH_SHORT).show();
-                
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // cancel the dialog
+                                                dialog.cancel();
                                                 hideView(dialogBack);
-                                                // do something for button 4
-                                                break;
-
-                                            case 2:
-                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                                builder.setTitle("Edit Homepage");
-                                                builder.setMessage("Enter new website or webaddress");
-                                                final EditText input = new EditText(MainActivity.this);
-                                                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                                                input.setHint("Enter new website or webaddress");
-                                                builder.setView(input);
-                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        // get the input value from the EditText object
-                                                        String value = input.getText().toString();
-                                                        String search = "https";
-                                                        String webqr = ".com";
-
-                                                        if (value.toLowerCase().indexOf(search.toLowerCase()) != -1) {
-                                                            String homestr = value;
-                                                            SharedPreferences.Editor editor = sharedPref.edit();
-                                                            editor.putString("homepage", homestr);
-                                                            editor.apply();
-                                                            Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                        else if (value.toLowerCase().indexOf(webqr.toLowerCase()) != -1) {
-                                                            String homestr = ("https://" + value);
-                                                            SharedPreferences.Editor editor = sharedPref.edit();
-                                                            editor.putString("homepage", homestr);
-                                                            editor.apply();
-                                                            Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect", Toast.LENGTH_SHORT).show();
-
-                                                        }
-                                                        else {
-                                                            String homestr = homePage;
-                                                            SharedPreferences.Editor editor = sharedPref.edit();
-                                                            editor.putString("homepage", homestr);
-                                                            editor.apply();
-                                                            Toast.makeText(MainActivity.this, "Entered format is invalid Homepage set to " + homestr + "  Please restart application in order for changes to take effect  ", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                });
-                                                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        // cancel the dialog
-                                                        dialog.cancel();
-                                                    }
-                                                });
-
-// create and show the AlertDialog object from the AlertDialog.Builder object
-                                                AlertDialog newdialog = builder.create();
-                                                newdialog.show();
-                                                hideView(dialogBack);
-                                                break;
-
-                                            case 3:
-                                                SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
-
-                                                boolean site1load = sitelist0.getBoolean (site1, true);
-                                                boolean site2load = sitelist0.getBoolean (site2, true);
-                                                boolean site3load = sitelist0.getBoolean (homePage, true);
-                                                if (site1load == false || site2load == false || site3load == false ){
-                                                    Toast.makeText(MainActivity.this, "Enabled offline loading ", Toast.LENGTH_SHORT).show();
-
-                                                    sitelist0.edit().putBoolean(site1, true ).apply();
-
-
-                                                    sitelist0.edit().putBoolean(site2, true).apply();
-
-                                                    sitelist0.edit().putBoolean(homePage, true).apply();
-                                                    hideView(dialogBack);
-                                                   } 
-                                                else{
-                                                    Toast.makeText(MainActivity.this, "Disabled offline loading ", Toast.LENGTH_SHORT).show();
-
-                                                    sitelist0.edit().putBoolean(site1,false).apply();
-                                                    sitelist0.edit().putBoolean(site2,false).apply();
-
-                                                    sitelist0.edit().putBoolean(homePage,false).apply();
-                                                    hideView(dialogBack);
-                                                }
-                                               
-                                                hideView(dialogBack);
-                                                // do something for button 4
-                                                break;
-                                             case 4:
-                                                SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
-
-                                                boolean pipm = pipmode.getBoolean ("pip", false);
-                                                if (pipm == true){
-                                                    pipmode.edit().putBoolean("pip", false ).apply();
-                                                    Toast.makeText(MainActivity.this, "Disabled Background Play", Toast.LENGTH_SHORT).show();
-
-                                                }else{
-                                                    pipmode.edit().putBoolean("pip", true ).apply();
-                                                    Toast.makeText(MainActivity.this, "Enabled background play", Toast.LENGTH_SHORT).show();
-
-                                                }
-
-                                                hideView(dialogBack);
-                                                // do something for button 4
-                                                break;
-
-                                                
-                                            case 5:
-                                                webView.loadUrl(sourcecode);
-                                                hideView(dialogBack);
-                                                // do something for button 3
-                                                break;
-                                                
-                                            case 6:
-                                                hideView(dialogBack);
-                                                // do something for button 4
-                                                break;
-                                            
-                                        }
-                                    }
-                                });
-
-// create and show the dialog
-                                AlertDialog dialog = builder.create();
-                                dialog.show();
+                                            }})
+                                        .show();
+                                hideView(dialogBack);
+                                break;
 
                             } else {
                                 webView.goBack();

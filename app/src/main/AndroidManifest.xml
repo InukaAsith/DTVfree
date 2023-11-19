@@ -33,6 +33,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:resizeableActivity="true"
             android:supportsPictureInPicture="true" 
             android:exported="true">
 
