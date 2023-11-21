@@ -1,0 +1,77 @@
+<html>
+<head>
+  <style>
+    /* Center the content */
+    .container {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    /* Style the image */
+    .image {
+      width: 300px;
+      height: 300px;
+    }
+
+    /* Style the message */
+    .message {
+      font-size: 24px;
+      color: red;
+    }
+
+    /* Style the button */
+    .button {
+      font-size: 18px;
+      color: white;
+      background-color: blue;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Style the error */
+    .error {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      font-size: 18px;
+      color: white;
+      background-color: black;
+    }
+  </style>
+  <script>
+    // Get the error parameters from the URL
+    var url = new URL(window.location.href);
+    var errorCode = url.searchParams.get("errorCode");
+    var description = url.searchParams.get("description");
+    var failingUrl = url.searchParams.get("failingUrl");
+
+    // Define a function to reload the WebView
+    function reloadWebView() {
+      // Clear the cache (both memory and disk)
+      webView.clearCache(true);
+      // Use the failing URL as the target
+      window.location.href = failingUrl;
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <!-- Use any image you like -->
+    <img src="cool-image.jpg" alt="Cool Image" class="image">
+    <p class="message">Check your internet</p>
+    <!-- Add a refresh button that calls the reloadWebView function -->
+    <button class="button" onclick="reloadWebView()">Refresh</button>
+  </div>
+  <!-- Show the error parameters in the error div -->
+  <div class="error">Error: Webpage not available (Code: <span id="errorCode"></span>, Description: <span id="description"></span>)</div>
+  <script>
+    // Set the error parameters in the error div
+    document.getElementById("errorCode").innerHTML = errorCode;
+    document.getElementById("description").innerHTML = description;
+  </script>
+</body>
+</html>
