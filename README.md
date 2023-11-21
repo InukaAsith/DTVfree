@@ -38,6 +38,10 @@ If you have any issues with functionality of this app feel free to drop a mail
 DreamTV is a web browser, Websites and content accessed through this app is belongs to website authors.
 DreamTVfree app or developer does not hold any accountability for any of that
 
+### Data collection and Privacy
+
+This application does not collect or store personal data. 
+
 ## Credits
 
 https://github.com/mehmetumit/VitaBrowser/
