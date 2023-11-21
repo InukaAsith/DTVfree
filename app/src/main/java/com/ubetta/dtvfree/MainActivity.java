@@ -768,6 +768,12 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
 
+           // Override the onReceivedError method
+           @Override
+           public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+          // Pass the error parameters to the error page
+             view.loadUrl("file:///android_asset/error.html?errorCode=" + errorCode + "&description=" + description + "&failingUrl=" + failingUrl);
+           }
 
 
 
