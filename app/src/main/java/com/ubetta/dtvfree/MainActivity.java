@@ -396,8 +396,26 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
 
-                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage","Enable/Disable offline loading","Enable/Disable Background Play","Check Update", "Cancel"};
+                boolean pipm = pipmode.getBoolean ("pip", false);
+                SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
+
+                boolean site1load = sitelist0.getBoolean (site1, true);
+                boolean site2load = sitelist0.getBoolean (site2, true);
+                boolean site3load = sitelist0.getBoolean (homePage, true);
+                if (site1load == false || site2load == false || site3load == false ){
+                   String offmode = "Enable";
+                }else{
+                    String offmode = "Disable";
+                }
+                if (pipm == true){
+                    String enpip = "Disable";
+                        }else{
+                    String enpip = "Enable";
+                        }
+
+                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage",offmode + " offline loading", enpip +" Background Play","Check Update", "Cancel"};
 
 // create an alert dialog builder
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -474,11 +492,6 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
                             case 3:
-                                SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
-
-                                boolean site1load = sitelist0.getBoolean (site1, true);
-                                boolean site2load = sitelist0.getBoolean (site2, true);
-                                boolean site3load = sitelist0.getBoolean (homePage, true);
                                 if (site1load == false || site2load == false || site3load == false ){
                                     Toast.makeText(MainActivity.this, "Enabled offline loading ", Toast.LENGTH_SHORT).show();
 
@@ -504,9 +517,7 @@ public class MainActivity extends AppCompatActivity {
                                 // do something for button 4
                                 break;
                             case 4:
-                                SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
-
-                                boolean pipm = pipmode.getBoolean ("pip", false);
+                                
                                 if (pipm == true){
                                     pipmode.edit().putBoolean("pip", false ).apply();
                                     Toast.makeText(MainActivity.this, "Disabled Background Play", Toast.LENGTH_SHORT).show();
