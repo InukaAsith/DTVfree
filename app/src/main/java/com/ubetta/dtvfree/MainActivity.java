@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private String homePage = "https://datafreetv.live/";
+    private String helppage = "https://telegra.ph/Help-Memu-11-22";
 
     private String site1 = "https://datafreetv.live/dtv.html";
     private String site2 = "https://datafreetv.live/peotvgo.html";
@@ -281,6 +282,33 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+
+        hab.setOnLongClickListener (new View.OnLongClickListener () {
+           @Override
+            public boolean onLongClick (View v) {
+             String offsite0 = webView.getUrl();
+             checkPermission();
+              boolean issitethere = sitelist.getBoolean (offsite0, false);
+              if (issitethere){
+                  if (offsite1 != null) {
+                        sitelist.edit().putBoolean(offsite0, false).apply();
+                        Toast.makeText(MainActivity.this, "Removed from offline sites. ", Toast.LENGTH_SHORT).show();
+                  }
+                }else{
+
+                    String offsite = webView.getUrl();
+                    if (offsite!= null) {
+                        sitelist.edit().putBoolean(offsite, true).apply();
+                        Toast.makeText(MainActivity.this, "Added to offline sites. This website will be loaded in offline mode", Toast.LENGTH_SHORT).show();
+                    }
+              }
+            
+            return true;
+          }
+       });
+
+       
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -415,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
                     String enpip = "Enable";
                         }
 
-                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage",offmode + " offline loading", enpip +" Background Play","Check Update", "Cancel"};
+                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage",offmode + " offline loading", enpip +" Background Play","Check Update","Help", "Cancel"};
 
 // create an alert dialog builder
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -540,6 +568,12 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
                             case 6:
+                                webView.loadUrl(helppage);
+                                hideView(dialogBack);
+                                // do something for button 3
+                                break;
+
+                            case 7:
                                 hideView(dialogBack);
                                 // do something for button 4
                                 break;
@@ -776,8 +810,10 @@ public class MainActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading (WebView view, String url) {
                 // check if the URL is in the saved sites list
                 boolean isSaved = sitelist.getBoolean (url, false);
+                
+                String urlfinal = url.toString();
 
-                if (url.startsWith("tg://")) {
+                if (urlfinal.startsWith("tg://")) {
 
                     // Create an Intent with the ACTION_VIEW action and the URL as data
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
