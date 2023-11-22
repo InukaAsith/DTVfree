@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText searchBar ;
     private RelativeLayout frame,dialogBack;
     private boolean firstDown = true;
-    private ImageButton fab, homeButton,forwardButton,backButton,refreshButton, editButton, closeButton, updateButton, cursorButton,remsavedButton,addsavedButton,clearButton;
+    private ImageButton hab, fab, homeButton,forwardButton,backButton,refreshButton, editButton, closeButton, updateButton, cursorButton,remsavedButton,addsavedButton,clearButton;
     private View[][] panelViews ;
 
     static final int PERMISSION_REQUEST_DOWNLOAD = 3;
@@ -99,13 +99,14 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_REQUEST_DOWNLOAD);
         }
     }
-    private String homePage = "https://google.com/";
+    private String homePage = "https://datafreetv.live/";
+    private String helppage = "https://telegra.ph/Help-Memu-11-22";
 
-    private String site1 = "https://www.google.com/search?q=";
-    private String site2 = "https://google.com/search?q=";
+    private String site1 = "https://datafreetv.live/dtv.html";
+    private String site2 = "https://datafreetv.live/peotvgo.html";
     private boolean nocursor = false;
     private String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
-    private String version = "v4.2.1";
+    private String version = "v4.3.0";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         if (isFirstTime) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Welcome Back");
-            builder.setMessage("Thanks for installing application. 🎉 \n\nDTVFree" + version + "\nCurrent Homepage:" + homepge + "\n\nFor faster performance and reduced data usage this application uses offline webpage loading as default. \nWhen using offline mode you need to update or refresh website to get latest features. \n\n Android TV users can turn on or off mouse cursor based on your preference. \n\nIf you want to use background video playback (Pip mode) please allow display over other apps permission from Settings.\n\nYou can change these settings anytime from settings menu or back button menu. \n\nPlease don't forget to join telegram channel for latest updates.\nEnjoy 😊\n\nDo you want to use offline loading?");
+            builder.setMessage("Thanks for installing application. 🎉 \n\nData Free TV " + version + "\nCurrent Homepage: " + homepge + "\n\nFor faster performance and reduced data usage this application uses offline webpage loading as default. \nWhen using offline mode you need to update or refresh website to get latest features. \n\n Android TV users can turn on or off mouse cursor based on your preference. \n\nYou can change these settings anytime from settings menu or back button menu. \n\nPlease don't forget to join telegram channel for latest updates.\nEnjoy 😊\n\nDo you want to use offline loading?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -174,13 +175,14 @@ public class MainActivity extends AppCompatActivity {
             cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
 
         }
-
+        hab =  findViewById(R.id.hab);
         closeButton = findViewById(R.id.close_button);
         clearButton = findViewById(R.id.clear_button);
         addsavedButton = findViewById(R.id.addsaved_button);
         remsavedButton = findViewById(R.id.remsaved_button);
         editButton = findViewById(R.id.edit_button);
         updateButton = findViewById(R.id.update_button);
+
         //SharedPreferences sitelist = getSharedPreferences ("saved_sites", MODE_PRIVATE);
 
         homeButton.setOnClickListener(new View.OnClickListener() {
@@ -273,6 +275,40 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+        hab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                webView.loadUrl(homepge);
+
+            }
+        });
+
+
+        hab.setOnLongClickListener (new View.OnLongClickListener () {
+            @Override
+            public boolean onLongClick (View v) {
+                String offsite0 = webView.getUrl();
+                checkPermission();
+                boolean issitethere = sitelist.getBoolean (offsite0, false);
+                if (issitethere){
+                    if (offsite0 != null) {
+                        sitelist.edit().putBoolean(offsite0, false).apply();
+                        Toast.makeText(MainActivity.this, "Removed from offline sites. ", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+
+                    String offsite = webView.getUrl();
+                    if (offsite!= null) {
+                        sitelist.edit().putBoolean(offsite, true).apply();
+                        Toast.makeText(MainActivity.this, "Added to offline sites. This website will be loaded in offline mode", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                return true;
+            }
+        });
+
+
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -388,8 +424,29 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
 
-                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage","Enable/Disable offline loading","Enable/Disable Background Play","Check Update", "Cancel"};
+                boolean pipm = pipmode.getBoolean ("pip", false);
+                SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
+
+                boolean site1load = sitelist0.getBoolean (site1, true);
+                boolean site2load = sitelist0.getBoolean (site2, true);
+                boolean site3load = sitelist0.getBoolean (homePage, true);
+                String offmode = "Enable/Disable";
+                String enpip = "Enable/Disable";
+                if (site1load == false || site2load == false || site3load == false ){
+                    offmode = "Enable";
+                }else{
+                    offmode = "Disable";
+                }
+                if (pipm == true){
+                    enpip = "Disable";
+                }else{
+                    enpip = "Enable";
+                }
+
+
+                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage", offmode + " offline loading", enpip +" Background Play","Check Update","Help", "Cancel"};
 
 // create an alert dialog builder
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -466,11 +523,6 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
                             case 3:
-                                SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
-
-                                boolean site1load = sitelist0.getBoolean (site1, true);
-                                boolean site2load = sitelist0.getBoolean (site2, true);
-                                boolean site3load = sitelist0.getBoolean (homePage, true);
                                 if (site1load == false || site2load == false || site3load == false ){
                                     Toast.makeText(MainActivity.this, "Enabled offline loading ", Toast.LENGTH_SHORT).show();
 
@@ -480,6 +532,11 @@ public class MainActivity extends AppCompatActivity {
                                     sitelist0.edit().putBoolean(site2, true).apply();
 
                                     sitelist0.edit().putBoolean(homePage, true).apply();
+                                    new AlertDialog.Builder(MainActivity.this)
+                                            .setTitle("Add more Offline Pages")
+                                            .setMessage("Hold Home Button Add/Remove any site to offline sites list")
+                                            .setPositiveButton("Got it", (dialog1, which1) -> {})
+                                            .show();
                                     hideView(dialogBack);
                                 }
                                 else{
@@ -496,9 +553,7 @@ public class MainActivity extends AppCompatActivity {
                                 // do something for button 4
                                 break;
                             case 4:
-                                SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
 
-                                boolean pipm = pipmode.getBoolean ("pip", false);
                                 if (pipm == true){
                                     pipmode.edit().putBoolean("pip", false ).apply();
                                     Toast.makeText(MainActivity.this, "Disabled Background Play", Toast.LENGTH_SHORT).show();
@@ -506,7 +561,11 @@ public class MainActivity extends AppCompatActivity {
                                 }else{
                                     pipmode.edit().putBoolean("pip", true ).apply();
                                     Toast.makeText(MainActivity.this, "Enabled background play", Toast.LENGTH_SHORT).show();
-
+                                    new AlertDialog.Builder(MainActivity.this)
+                                            .setTitle("How to watch Picture in Picture")
+                                            .setMessage("Exit app while on full screen to enter Picture in Picture")
+                                            .setPositiveButton("Got it", (dialog1, which1) -> {})
+                                            .show();
                                 }
 
                                 hideView(dialogBack);
@@ -521,18 +580,24 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
                             case 6:
+                                webView.loadUrl(helppage);
+                                hideView(dialogBack);
+                                // do something for button 3
+                                break;
+
+                            case 7:
                                 hideView(dialogBack);
                                 // do something for button 4
                                 break;
 
 
-                    }
+                        }
 
-                }
-                    });
+                    }
+                });
                 AlertDialog dialog1 = builder.create();
                 dialog1.show();
-                }
+            }
 
         });
 
@@ -718,10 +783,13 @@ public class MainActivity extends AppCompatActivity {
                 boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
                 if (!isTV) {
                     if (url.equals(homepge)) {
+                        hab.setVisibility(View.GONE);
                         fab.setVisibility(View.VISIBLE);
                     } else {
                         //Otherwise, hide the FAB
+
                         fab.setVisibility(View.GONE);
+                        hab.setVisibility(View.VISIBLE);
                     }
                 }
                 super.onPageStarted(view, url, favicon);
@@ -754,7 +822,10 @@ public class MainActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading (WebView view, String url) {
                 // check if the URL is in the saved sites list
                 boolean isSaved = sitelist.getBoolean (url, false);
-                if (url.startsWith("tg://")) {
+
+                String urlfinal = url.toString();
+
+                if (urlfinal.startsWith("tg://")) {
 
                     // Create an Intent with the ACTION_VIEW action and the URL as data
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -765,6 +836,8 @@ public class MainActivity extends AppCompatActivity {
                     // Return true to indicate that the URL loading is handled
                     return true;
                 }
+
+
                 // set the cache mode according to the URL's status in the list
                 if (isSaved) {
                     // if the URL is in the list, set the cache mode to load from cache only
@@ -778,12 +851,12 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
 
-           // Override the onReceivedError method
-           @Override
-           public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-          // Pass the error parameters to the error page
-             view.loadUrl("file:///android_asset/error.html?errorCode=" + errorCode + "&description=" + description + "&failingUrl=" + failingUrl);
-           }
+            // Override the onReceivedError method
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                // Pass the error parameters to the error page
+                view.loadUrl("file:///android_asset/error.html?errorCode=" + errorCode + "&description=" + description + "&failingUrl=" + failingUrl);
+            }
 
 
 
