@@ -65,13 +65,11 @@
     var errorCode = url.searchParams.get("errorCode");
     var description = url.searchParams.get("description");
     var failingUrl = url.searchParams.get("failingUrl");
-
-    // Define a function to reload the WebView
-    function reloadWebView() {
-      // Clear the cache (both memory and disk)
-      WebView.clearCache(true);
+function reloadWebView() {
       // Use the failing URL as the target
-      WebView.reload();
+      window.location.href = failingUrl;
+    // Define a function to reload the WebView
+      webView.clearCache(true);
     }
   </script>
 </head>
