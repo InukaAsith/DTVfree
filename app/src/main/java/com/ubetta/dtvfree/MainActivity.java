@@ -285,16 +285,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         hab.setOnLongClickListener (new View.OnLongClickListener () {
-           @Override
+            @Override
             public boolean onLongClick (View v) {
-             String offsite0 = webView.getUrl();
-             checkPermission();
-              boolean issitethere = sitelist.getBoolean (offsite0, false);
-              if (issitethere){
-                  if (offsite1 != null) {
+                String offsite0 = webView.getUrl();
+                checkPermission();
+                boolean issitethere = sitelist.getBoolean (offsite0, false);
+                if (issitethere){
+                    if (offsite0 != null) {
                         sitelist.edit().putBoolean(offsite0, false).apply();
                         Toast.makeText(MainActivity.this, "Removed from offline sites. ", Toast.LENGTH_SHORT).show();
-                  }
+                    }
                 }else{
 
                     String offsite = webView.getUrl();
@@ -302,13 +302,13 @@ public class MainActivity extends AppCompatActivity {
                         sitelist.edit().putBoolean(offsite, true).apply();
                         Toast.makeText(MainActivity.this, "Added to offline sites. This website will be loaded in offline mode", Toast.LENGTH_SHORT).show();
                     }
-              }
-            
-            return true;
-          }
-       });
+                }
 
-       
+                return true;
+            }
+        });
+
+
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -432,18 +432,21 @@ public class MainActivity extends AppCompatActivity {
                 boolean site1load = sitelist0.getBoolean (site1, true);
                 boolean site2load = sitelist0.getBoolean (site2, true);
                 boolean site3load = sitelist0.getBoolean (homePage, true);
+                String offmode = "Enable/Disable";
+                String enpip = "Enable/Disable";
                 if (site1load == false || site2load == false || site3load == false ){
-                   String offmode = "Enable";
+                    offmode = "Enable";
                 }else{
-                    String offmode = "Disable";
+                    offmode = "Disable";
                 }
                 if (pipm == true){
-                    String enpip = "Disable";
-                        }else{
-                    String enpip = "Enable";
-                        }
+                    enpip = "Disable";
+                }else{
+                    enpip = "Enable";
+                }
 
-                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage",offmode + " offline loading", enpip +" Background Play","Check Update","Help", "Cancel"};
+
+                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage", offmode + " offline loading", enpip +" Background Play","Check Update","Help", "Cancel"};
 
 // create an alert dialog builder
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -529,6 +532,11 @@ public class MainActivity extends AppCompatActivity {
                                     sitelist0.edit().putBoolean(site2, true).apply();
 
                                     sitelist0.edit().putBoolean(homePage, true).apply();
+                                    new AlertDialog.Builder(MainActivity.this)
+                                            .setTitle("Download Update")
+                                            .setMessage("Hold Home Button Add/Remove any site to offline sites list")
+                                            .setPositiveButton("Got it", (dialog1, which1) -> {})
+                                            .show();
                                     hideView(dialogBack);
                                 }
                                 else{
@@ -545,7 +553,7 @@ public class MainActivity extends AppCompatActivity {
                                 // do something for button 4
                                 break;
                             case 4:
-                                
+
                                 if (pipm == true){
                                     pipmode.edit().putBoolean("pip", false ).apply();
                                     Toast.makeText(MainActivity.this, "Disabled Background Play", Toast.LENGTH_SHORT).show();
@@ -579,13 +587,13 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
 
-                    }
+                        }
 
-                }
-                    });
+                    }
+                });
                 AlertDialog dialog1 = builder.create();
                 dialog1.show();
-                }
+            }
 
         });
 
@@ -810,7 +818,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading (WebView view, String url) {
                 // check if the URL is in the saved sites list
                 boolean isSaved = sitelist.getBoolean (url, false);
-                
+
                 String urlfinal = url.toString();
 
                 if (urlfinal.startsWith("tg://")) {
@@ -839,12 +847,12 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
 
-           // Override the onReceivedError method
-           @Override
-           public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-          // Pass the error parameters to the error page
-             view.loadUrl("file:///android_asset/error.html?errorCode=" + errorCode + "&description=" + description + "&failingUrl=" + failingUrl);
-           }
+            // Override the onReceivedError method
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                // Pass the error parameters to the error page
+                view.loadUrl("file:///android_asset/error.html?errorCode=" + errorCode + "&description=" + description + "&failingUrl=" + failingUrl);
+            }
 
 
 
