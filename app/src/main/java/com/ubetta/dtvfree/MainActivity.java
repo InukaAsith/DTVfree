@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     private String site2 = "https://datafreetv.live/peotvgo.html";
     private boolean nocursor = false;
     private String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
-    private String version = "v4.2.1";
+    private String version = "v4.3.0";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
