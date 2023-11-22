@@ -754,7 +754,17 @@ public class MainActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading (WebView view, String url) {
                 // check if the URL is in the saved sites list
                 boolean isSaved = sitelist.getBoolean (url, false);
+                if (url.startsWith("tg://")) {
 
+                    // Create an Intent with the ACTION_VIEW action and the URL as data
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+
+                    // Start the activity with the Intent
+                    startActivity(intent);
+
+                    // Return true to indicate that the URL loading is handled
+                    return true;
+                }
                 // set the cache mode according to the URL's status in the list
                 if (isSaved) {
                     // if the URL is in the list, set the cache mode to load from cache only
