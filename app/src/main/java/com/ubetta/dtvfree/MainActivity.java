@@ -109,10 +109,6 @@ public class MainActivity extends AppCompatActivity {
     private String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
     private String version = "v4.3.0";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
-    private boolean isError; // A flag to indicate if there is an error
-
-    private String lastSuccessUrl;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
         if (isFirstTime) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Welcome Back");
-            builder.setMessage("Thanks for installing application. 🎉 \n\nData Free TV" + version + "\nCurrent Homepage:" + homepge + "\n\nFor faster performance and reduced data usage this application uses offline webpage loading as default. \nWhen using offline mode you need to update or refresh website to get latest features. \n\n Android TV users can turn on or off mouse cursor based on your preference. \n\nIf you want to use background video playback (Pip mode) please allow display over other apps permission from Settings.\n\nYou can change these settings anytime from settings menu or back button menu. \n\nPlease don't forget to join telegram channel for latest updates.\nEnjoy 😊\n\nDo you want to use offline loading?");
+            builder.setMessage("Thanks for installing application. 🎉 \n\nData Free TV" + version + "\nCurrent Homepage:" + homepge + "\n\nFor faster performance and reduced data usage this application uses offline webpage loading as default. \nWhen using offline mode you need to update or refresh website to get latest features. \n\n Android TV users can turn on or off mouse cursor based on your preference. \n\nYou can change these settings anytime from settings menu or back button menu. \n\nPlease don't forget to join telegram channel for latest updates.\nEnjoy 😊\n\nDo you want to use offline loading?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -431,7 +427,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
 
-                boolean pipm = pipmode.getBoolean ("pip", true);
+                boolean pipm = pipmode.getBoolean ("pip", false);
                 SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
 
                 boolean site1load = sitelist0.getBoolean (site1, true);
@@ -538,7 +534,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     sitelist0.edit().putBoolean(homePage, true).apply();
                                     new AlertDialog.Builder(MainActivity.this)
-                                            .setTitle("Download Update")
+                                            .setTitle("Add More sites to Offline Pages")
                                             .setMessage("Hold Home Button Add/Remove any site to offline sites list")
                                             .setPositiveButton("Got it", (dialog1, which1) -> {})
                                             .show();
@@ -566,6 +562,12 @@ public class MainActivity extends AppCompatActivity {
                                 }else{
                                     pipmode.edit().putBoolean("pip", true ).apply();
                                     Toast.makeText(MainActivity.this, "Enabled background play", Toast.LENGTH_SHORT).show();
+				    new AlertDialog.Builder(MainActivity.this)
+                 		        .setTitle("How to watch Picture in Picture mode")
+                     		        .setMessage("Exit app by pressing home button or guesture to while on fullscreen to watch picture in picture ")
+                    			.setPositiveButton("OK", (dialog1, which1) -> {})
+                 		       .show();
+              			        hideView(dialogBack);
 
                                 }
 
@@ -576,6 +578,12 @@ public class MainActivity extends AppCompatActivity {
 
                             case 5:
                                 webView.loadUrl(sourcecode);
+				new AlertDialog.Builder(MainActivity.this)
+              		         .setTitle("Download Update")
+              		          .setMessage("Current app version is " + version + ".  Goto assets and download latest apk file and install it from your file manager app")
+            		            .setPositiveButton("OK", (dialog1, which1) -> {})
+                     		   .show();
+               
                                 hideView(dialogBack);
                                 // do something for button 3
                                 break;
@@ -590,8 +598,8 @@ public class MainActivity extends AppCompatActivity {
                                 String webver = webView.getSettings().getUserAgentString();
                                 new AlertDialog.Builder(MainActivity.this)
                                             .setTitle("About")
-                                            .setMessage("DTVFree "+ version + " \n\nCurrent Homapage: "+ homepge +  " \n\nDeveloper: "+ sourcecode+  " \n\nCurrent Webview Versiona:" +  webver+ "\n\n Privacy Policy\n\nThis application does not collect or store personal data.")
-                                            .setPositiveButton("Got it", (dialog1, which1) -> {})
+                                            .setMessage("DTVFree "+ version + " \n\nCurrent Homapage: "+ homepge +  " \n\nDeveloper: "+ sourcecode+  " \n\nCurrent Webview Version:" +  webver+ "\n\n Privacy Policy\n\nThis application does not collect or store personal data.")
+                                            .setPositiveButton("Cancel", (dialog1, which1) -> {})
                                             .show();
                                 hideView(dialogBack);
                                 // do something for button 3
@@ -781,10 +789,20 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         });
 
-        isError = false;
-        lastSuccessUrl = homepge;
+
+
 // Set a webview client to the webview
         webView.setWebViewClient(new WebViewClient() {
+
+            // A stack to store the visited URLs
+            private Stack<String> historyStack;
+
+    // Initialize the history stack in an initializer block
+    {
+        historyStack = new Stack<>();
+    }
+            private boolean isError; // A flag to indicate if there is an error
+
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 // Show the loading indicator when the webview starts loading
@@ -815,19 +833,19 @@ public class MainActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 searchBar.setHint(webView.getUrl());
                 PackageManager pm = getPackageManager();
+
                 // Check if the device is an Android TV
                 boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
 
                 // If the device is not an Android TV, hide the status bar and the navigation bar
                 if (!isTV) {
-
                     if (url.equals(homepge)) {
-                        hab.setVisibility(View.GONE);
+                        hab.setVisibility(View.GONE)
                         fab.setVisibility(View.VISIBLE);
                     } else {
                         //Otherwise, hide the FAB
                         fab.setVisibility(View.GONE);
-                        hab.setVisibility(View.VISIBLE);
+                        hab.setVisibility(View.VISIBLE)
                     }
                 }
             }
@@ -835,10 +853,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading (WebView view, String url) {
                 // check if the URL is in the saved sites list
-                boolean isSaved = sitelist.getBoolean(url, false);
+                boolean isSaved = sitelist.getBoolean (url, false);
 
+                String urlfinal = url.toString();
+                if (!isError) {
+                    historyStack.push(url);
+                }
+                // Reset the error flag
+                isError = false;
+                // Load the URL normal
 
-                if (url.startsWith("tg://")) {
+                if (urlfinal.startsWith("tg://")) {
 
                     // Create an Intent with the ACTION_VIEW action and the URL as data
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -872,7 +897,16 @@ public class MainActivity extends AppCompatActivity {
                 isError = true;
             }
 
-
+            public boolean onBackPressed(WebView view) {
+                // If the history stack is not empty, pop the last URL and load it
+                if (!historyStack.isEmpty()) {
+                    String url = historyStack.pop();
+                    view.loadUrl(url);
+                    return true;
+                }
+                // Otherwise, return false to let the system handle the back button
+                return false;
+            }
 
             final InputStream emptyInputStream = new ByteArrayInputStream(new byte[0]);
 
@@ -1081,7 +1115,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
         boolean pipm = pipmode.getBoolean ("pip", false);
         if (pipm == true){
-            hab.setVisibility(View.GONE);
+            hab.setVisibility(View.GONE)
             // Enter PIP mode when the user leaves the app and the webview is showing a video in full screen mode
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && webClient.isVideoFullScreen()) {
                 enterPictureInPictureMode(new PictureInPictureParams.Builder()
@@ -1336,16 +1370,8 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
                             } else {
-                                if (isError) {
-                                    // Set the error status to false
-                                    isError = false;
-                                    // Go back to the previous page in the WebView
-                                    webView.loadUrl(lastSuccessUrl);
-                                } else {
-                                    // Otherwise, call the super method
-                                    webView.goBack();
-                                }
                                 //webView.goBack();
+                                super.onBackPressed();
                                 break;
                             }
                         }
