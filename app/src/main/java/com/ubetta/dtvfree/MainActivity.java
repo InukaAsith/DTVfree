@@ -586,7 +586,7 @@ public class MainActivity extends AppCompatActivity {
                                 String webver = webView.getSettings().getUserAgentString();
                                 new AlertDialog.Builder(MainActivity.this)
                                             .setTitle("About")
-                                            .setMessage("DTVFree "+ version + " \n\nCurrent Homapage: "+ homepge +  " \n\nDeveloper: "+ sourcecode+  " \n\nCurrent Webview Versiona:" +  webver)
+                                            .setMessage("DTVFree "+ version + " \n\nCurrent Homapage: "+ homepge +  " \n\nDeveloper: "+ sourcecode+  " \n\nCurrent Webview Versiona:" +  webver+ "\n\n Privacy Policy\n\nThis application does not collect or store personal data.")
                                             .setPositiveButton("Got it", (dialog1, which1) -> {})
                                             .show();
                                 hideView(dialogBack);
@@ -828,10 +828,12 @@ public class MainActivity extends AppCompatActivity {
                 // If the device is not an Android TV, hide the status bar and the navigation bar
                 if (!isTV) {
                     if (url.equals(homepge)) {
+                        hab.setVisibility(View.GONE)
                         fab.setVisibility(View.VISIBLE);
                     } else {
                         //Otherwise, hide the FAB
                         fab.setVisibility(View.GONE);
+                        hab.setVisibility(View.VISIBLE)
                     }
                 }
             }
@@ -1101,6 +1103,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
         boolean pipm = pipmode.getBoolean ("pip", false);
         if (pipm == true){
+            hab.setVisibility(View.GONE)
             // Enter PIP mode when the user leaves the app and the webview is showing a video in full screen mode
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && webClient.isVideoFullScreen()) {
                 enterPictureInPictureMode(new PictureInPictureParams.Builder()
