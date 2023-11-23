@@ -446,7 +446,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
-                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage", offmode + " offline loading", enpip +" Background Play","Check Update","Help", "Cancel"};
+                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage", offmode + " offline loading", enpip +" Background Play","Check Update","Help","About", "Cancel"};
 
 // create an alert dialog builder
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -582,6 +582,20 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
                             case 7:
+                                val pm = requireActivity().packageManager
+                                val pi = pm.getPackageInfo("com.google.android.webview", 0)
+                                val currentVersion = pi.versionName
+                                    String webver = url.toString();
+                                new AlertDialog.Builder(MainActivity.this)
+                                            .setTitle("About")
+                                            .setMessage("DTVFree "+ Version" \n\nCurrent Homapage: "+ homepge" \n\nDeveloper: "+ sourcecode" \n\nCurrent Webview Versiona:" +  webver)
+                                            .setPositiveButton("Got it", (dialog1, which1) -> {})
+                                            .show();
+                                hideView(dialogBack);
+                                // do something for button 3
+                                break;                                
+
+                            case 8:
                                 hideView(dialogBack);
                                 // do something for button 4
                                 break;
