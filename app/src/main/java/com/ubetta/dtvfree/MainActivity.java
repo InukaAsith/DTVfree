@@ -815,14 +815,9 @@ public class MainActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 searchBar.setHint(webView.getUrl());
                 PackageManager pm = getPackageManager();
-
-
                 // Check if the device is an Android TV
                 boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
-                if (view.getProgress() == 100) {
-                    // Update the last successful URL variable
-                    lastSuccessUrl = url;
-                }
+
                 // If the device is not an Android TV, hide the status bar and the navigation bar
                 if (!isTV) {
 
