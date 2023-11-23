@@ -109,6 +109,10 @@ public class MainActivity extends AppCompatActivity {
     private String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
     private String version = "v4.3.0";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
+    private boolean isError; // A flag to indicate if there is an error
+
+    private String lastSuccessUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -777,20 +781,10 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         });
 
-
-
+        isError = false;
+        lastSuccessUrl = homepge;
 // Set a webview client to the webview
         webView.setWebViewClient(new WebViewClient() {
-
-            // A stack to store the visited URLs
-            private Stack<String> historyStack;
-
-    // Initialize the history stack in an initializer block
-    {
-        historyStack = new Stack<>();
-    }
-            private boolean isError; // A flag to indicate if there is an error
-
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 // Show the loading indicator when the webview starts loading
@@ -822,11 +816,16 @@ public class MainActivity extends AppCompatActivity {
                 searchBar.setHint(webView.getUrl());
                 PackageManager pm = getPackageManager();
 
+
                 // Check if the device is an Android TV
                 boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
-
+                if (view.getProgress() == 100) {
+                    // Update the last successful URL variable
+                    lastSuccessUrl = url;
+                }
                 // If the device is not an Android TV, hide the status bar and the navigation bar
                 if (!isTV) {
+
                     if (url.equals(homepge)) {
                         hab.setVisibility(View.GONE);
                         fab.setVisibility(View.VISIBLE);
@@ -841,17 +840,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading (WebView view, String url) {
                 // check if the URL is in the saved sites list
-                boolean isSaved = sitelist.getBoolean (url, false);
+                boolean isSaved = sitelist.getBoolean(url, false);
 
-                String urlfinal = url.toString();
-                if (!isError) {
-                    historyStack.push(url);
-                }
-                // Reset the error flag
-                isError = false;
-                // Load the URL normal
 
-                if (urlfinal.startsWith("tg://")) {
+                if (url.startsWith("tg://")) {
 
                     // Create an Intent with the ACTION_VIEW action and the URL as data
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -885,16 +877,7 @@ public class MainActivity extends AppCompatActivity {
                 isError = true;
             }
 
-            public boolean onBackPressed(WebView view) {
-                // If the history stack is not empty, pop the last URL and load it
-                if (!historyStack.isEmpty()) {
-                    String url = historyStack.pop();
-                    view.loadUrl(url);
-                    return true;
-                }
-                // Otherwise, return false to let the system handle the back button
-                return false;
-            }
+
 
             final InputStream emptyInputStream = new ByteArrayInputStream(new byte[0]);
 
@@ -1358,8 +1341,16 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
                             } else {
+                                if (isError) {
+                                    // Set the error status to false
+                                    isError = false;
+                                    // Go back to the previous page in the WebView
+                                    webView.loadUrl(lastSuccessUrl);
+                                } else {
+                                    // Otherwise, call the super method
+                                    webView.goBack();
+                                }
                                 //webView.goBack();
-                                super.onBackPressed();
                                 break;
                             }
                         }
