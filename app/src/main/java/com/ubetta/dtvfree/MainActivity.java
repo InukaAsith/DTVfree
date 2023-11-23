@@ -69,6 +69,7 @@ import androidx.core.content.ContextCompat;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -582,13 +583,10 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
                             case 7:
-                                val pm = requireActivity().packageManager
-                                val pi = pm.getPackageInfo("com.google.android.webview", 0)
-                                val currentVersion = pi.versionName
-                                    String webver = url.toString();
+                                String webver = webView.getSettings().getUserAgentString();
                                 new AlertDialog.Builder(MainActivity.this)
                                             .setTitle("About")
-                                            .setMessage("DTVFree "+ Version" \n\nCurrent Homapage: "+ homepge" \n\nDeveloper: "+ sourcecode" \n\nCurrent Webview Versiona:" +  webver)
+                                            .setMessage("DTVFree "+ version + " \n\nCurrent Homapage: "+ homepge +  " \n\nDeveloper: "+ sourcecode+  " \n\nCurrent Webview Versiona:" +  webver)
                                             .setPositiveButton("Got it", (dialog1, which1) -> {})
                                             .show();
                                 hideView(dialogBack);
@@ -783,6 +781,10 @@ public class MainActivity extends AppCompatActivity {
 
 // Set a webview client to the webview
         webView.setWebViewClient(new WebViewClient() {
+
+            private Stack<String> historyStack; // A stack to store the visited URLs
+            private boolean isError; // A flag to indicate if there is an error
+
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 // Show the loading indicator when the webview starts loading
@@ -834,6 +836,12 @@ public class MainActivity extends AppCompatActivity {
                 boolean isSaved = sitelist.getBoolean (url, false);
 
                 String urlfinal = url.toString();
+                if (!isError) {
+                    historyStack.push(url);
+                }
+                // Reset the error flag
+                isError = false;
+                // Load the URL normal
 
                 if (urlfinal.startsWith("tg://")) {
 
@@ -866,10 +874,19 @@ public class MainActivity extends AppCompatActivity {
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                 // Pass the error parameters to the error page
                 view.loadUrl("file:///android_asset/error.html?errorCode=" + errorCode + "&description=" + description + "&failingUrl=" + failingUrl);
-                return false;
+                isError = true;
             }
 
-
+            public boolean onBackPressed(WebView view) {
+                // If the history stack is not empty, pop the last URL and load it
+                if (!historyStack.isEmpty()) {
+                    String url = historyStack.pop();
+                    view.loadUrl(url);
+                    return true;
+                }
+                // Otherwise, return false to let the system handle the back button
+                return false;
+            }
 
             final InputStream emptyInputStream = new ByteArrayInputStream(new byte[0]);
 
@@ -1304,6 +1321,7 @@ public class MainActivity extends AppCompatActivity {
 
                         // If the device is not an Android TV, hide the status bar and the navigation bar
                         if (!isTV) {
+
                             if (!webView.canGoBack()) {
                                 //hideView(dialogBack);
                                 // create an array of items to display
@@ -1327,10 +1345,12 @@ public class MainActivity extends AppCompatActivity {
                                             }})
                                         .show();
                                 hideView(dialogBack);
+
                                 break;
 
                             } else {
-                                webView.goBack();
+                                //webView.goBack();
+                                super.onBackPressed();
                                 break;
                             }
                         }
