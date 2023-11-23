@@ -782,7 +782,13 @@ public class MainActivity extends AppCompatActivity {
 // Set a webview client to the webview
         webView.setWebViewClient(new WebViewClient() {
 
-            private Stack<String> historyStack; // A stack to store the visited URLs
+            // A stack to store the visited URLs
+            private Stack<String> historyStack;
+
+    // Initialize the history stack in an initializer block
+    {
+        historyStack = new Stack<>();
+    }
             private boolean isError; // A flag to indicate if there is an error
 
             @Override
