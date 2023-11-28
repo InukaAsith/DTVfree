@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     private String site2 = "https://datafreetv.live/peotvgo.html";
     private boolean nocursor = false;
     private String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
-    private String version = "v4.3.0";
+    private String version = "v4.3.2";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     private boolean isError; // A flag to indicate if there is an error
     private boolean isdarkm = false; 
