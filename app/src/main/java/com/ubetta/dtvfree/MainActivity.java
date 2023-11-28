@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
     private String version = "v4.3.0";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     private boolean isError; // A flag to indicate if there is an error
-
+    private boolean isdarkm = false; 
     private String lastSuccessUrl;
 
     @Override
@@ -128,9 +128,17 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+//Check if the system dark mode is on
+       int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+       if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+    //Check if the force dark feature is supported
+         isdarkm = true;
+       }    
+
         // get your string from SharedPreferences
         String homepge = sharedPref.getString("homepage", homePage);
         boolean cursormode = sharedPref.getBoolean("nocursor", true);
+        boolean darkmode = sharedPref.getBoolean("darkmode", isdarkm);
         nocursor = cursormode;
 
 
@@ -430,6 +438,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
+                SharedPreferences darkmod = getSharedPreferences ("myPref", MODE_PRIVATE);
 
                 boolean pipm = pipmode.getBoolean ("pip", false);
                 SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
@@ -439,6 +448,7 @@ public class MainActivity extends AppCompatActivity {
                 boolean site3load = sitelist0.getBoolean (homePage, true);
                 String offmode = "Enable/Disable";
                 String enpip = "Enable/Disable";
+                String endark = "Enable/Disable";
                 if (site1load == false || site2load == false || site3load == false ){
                     offmode = "Enable";
                 }else{
@@ -449,9 +459,13 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     enpip = "Enable";
                 }
+               if (darkmod == true){
+                    endark = "Disable";
+                }else{
+                    endark = "Enable";
+               }
 
-
-                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage", offmode + " offline loading", enpip +" Background Play","Check Update","Help","About", "Cancel"};
+                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage", offmode + " offline loading", enpip +" Background Play",endark +" Dark Mode","Check Update","Help","About", "Cancel"};
 
 // create an alert dialog builder
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -578,8 +592,19 @@ public class MainActivity extends AppCompatActivity {
                                 // do something for button 4
                                 break;
 
+                           case 5:
+                                if (darkmod == true){
+                                    darkmod.edit().putBoolean("darkmode", false ).apply();
+                                    Toast.makeText(MainActivity.this, "Disabled Darkmode", Toast.LENGTH_SHORT).show();
 
-                            case 5:
+                                }else{
+                                    darkmod.edit().putBoolean("darkmode", true ).apply();
+                                    Toast.makeText(MainActivity.this, "Enabled Darkmode", Toast.LENGTH_SHORT).show();
+                                }
+                                hideView(dialogBack);
+                                
+                                break;
+                            case 6:
                                 webView.loadUrl(sourcecode);
                                 new AlertDialog.Builder(MainActivity.this)
                                         .setTitle("Download Update")
@@ -591,13 +616,13 @@ public class MainActivity extends AppCompatActivity {
                                 // do something for button 3
                                 break;
 
-                            case 6:
+                            case 7:
                                 webView.loadUrl(helppage);
                                 hideView(dialogBack);
                                 // do something for button 3
                                 break;
 
-                            case 7:
+                            case 8:
                                 String webver = webView.getSettings().getUserAgentString();
                                 new AlertDialog.Builder(MainActivity.this)
                                         .setTitle("About")
@@ -608,7 +633,7 @@ public class MainActivity extends AppCompatActivity {
                                 // do something for button 3
                                 break;
 
-                            case 8:
+                            case 9:
                                 hideView(dialogBack);
                                 // do something for button 4
                                 break;
@@ -725,7 +750,12 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setLoadWithOverviewMode(true);
-
+        if (darkmode){
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+        //Set the force dark mode to on
+            WebSettingsCompat.setForceDark(webView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
+            }
+        }
 
         // get a SharedPreferences object with the name “saved_sites”
 
