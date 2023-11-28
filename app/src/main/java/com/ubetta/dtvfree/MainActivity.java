@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
     private String version = "v4.3.0";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     private boolean isError; // A flag to indicate if there is an error
-    private boolean isdarkm = false; 
+
     private String lastSuccessUrl;
 
     @Override
@@ -128,18 +128,9 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-//Check if the system dark mode is on
-       int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-       if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
-    //Check if the force dark feature is supported
-         isdarkm = true;
-       }    
-
         // get your string from SharedPreferences
         String homepge = sharedPref.getString("homepage", homePage);
-        boolean cursormode = sharedPref.getBoolean("nocursor", false);
-        boolean darkmode = sharedPref.getBoolean("darkmode", isdarkm);
-    
+        boolean cursormode = sharedPref.getBoolean("nocursor", true);
         nocursor = cursormode;
 
 
@@ -439,7 +430,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
-                SharedPreferences darkmod = getSharedPreferences ("myPref", MODE_PRIVATE);
 
                 boolean pipm = pipmode.getBoolean ("pip", false);
                 SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
@@ -449,7 +439,6 @@ public class MainActivity extends AppCompatActivity {
                 boolean site3load = sitelist0.getBoolean (homePage, true);
                 String offmode = "Enable/Disable";
                 String enpip = "Enable/Disable";
-                String endark = "Enable/Disable";
                 if (site1load == false || site2load == false || site3load == false ){
                     offmode = "Enable";
                 }else{
@@ -460,13 +449,9 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     enpip = "Enable";
                 }
-               if (darkmod == true){
-                    endark = "Disable";
-                }else{
-                    endark = "Enable";
-               }
 
-                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage", offmode + " offline loading", enpip +" Background Play",endark +" Dark Mode","Check Update","Help","About", "Cancel"};
+
+                CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage", offmode + " offline loading", enpip +" Background Play","Check Update","Help","About", "Cancel"};
 
 // create an alert dialog builder
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -593,19 +578,8 @@ public class MainActivity extends AppCompatActivity {
                                 // do something for button 4
                                 break;
 
-                           case 5:
-                                if (darkmod == true){
-                                    darkmod.edit().putBoolean("darkmode", false ).apply();
-                                    Toast.makeText(MainActivity.this, "Disabled Darkmode", Toast.LENGTH_SHORT).show();
 
-                                }else{
-                                    darkmod.edit().putBoolean("darkmode", true ).apply();
-                                    Toast.makeText(MainActivity.this, "Enabled Darkmode", Toast.LENGTH_SHORT).show();
-                                }
-                                hideView(dialogBack);
-                                
-                                break;
-                            case 6:
+                            case 5:
                                 webView.loadUrl(sourcecode);
                                 new AlertDialog.Builder(MainActivity.this)
                                         .setTitle("Download Update")
@@ -617,13 +591,13 @@ public class MainActivity extends AppCompatActivity {
                                 // do something for button 3
                                 break;
 
-                            case 7:
+                            case 6:
                                 webView.loadUrl(helppage);
                                 hideView(dialogBack);
                                 // do something for button 3
                                 break;
 
-                            case 8:
+                            case 7:
                                 String webver = webView.getSettings().getUserAgentString();
                                 new AlertDialog.Builder(MainActivity.this)
                                         .setTitle("About")
@@ -634,7 +608,7 @@ public class MainActivity extends AppCompatActivity {
                                 // do something for button 3
                                 break;
 
-                            case 9:
+                            case 8:
                                 hideView(dialogBack);
                                 // do something for button 4
                                 break;
@@ -751,12 +725,7 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setLoadWithOverviewMode(true);
-        if (darkmode){
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
-        //Set the force dark mode to on
-            WebSettingsCompat.setForceDark(webView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
-            }
-        }
+
 
         // get a SharedPreferences object with the name “saved_sites”
 
@@ -835,7 +804,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Check if the device is an Android TV
                 boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
-                if (!isTV) {
+             //   if (!isTV) {
                     if (url.equals(homepge)) {
                         hab.setVisibility(View.GONE);
                         fab.setVisibility(View.VISIBLE);
@@ -845,7 +814,7 @@ public class MainActivity extends AppCompatActivity {
                         fab.setVisibility(View.GONE);
                         hab.setVisibility(View.VISIBLE);
                     }
-                }
+             //   }
                 super.onPageStarted(view, url, favicon);
 
             }
@@ -859,9 +828,12 @@ public class MainActivity extends AppCompatActivity {
                 PackageManager pm = getPackageManager();
                 // Check if the device is an Android TV
                 boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
+                //Assuming you have a WebView object named webView
+                webView.evaluateJavascript("document.getElementById('fullscreenButton').click();", null);
+
 
                 // If the device is not an Android TV, hide the status bar and the navigation bar
-                if (!isTV) {
+              //  if (!isTV) {
 
                     if (url.equals(homepge)) {
                         hab.setVisibility(View.GONE);
@@ -871,7 +843,7 @@ public class MainActivity extends AppCompatActivity {
                         fab.setVisibility(View.GONE);
                         hab.setVisibility(View.VISIBLE);
                     }
-                }
+               // }
             }
 
             @Override
@@ -1121,7 +1093,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
         SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
-        boolean pipm = pipmode.getBoolean ("pip", false);
+        boolean pipm = pipmode.getBoolean ("pip", true);
         if (pipm == true){
             hab.setVisibility(View.GONE);
             // Enter PIP mode when the user leaves the app and the webview is showing a video in full screen mode
@@ -1350,7 +1322,10 @@ public class MainActivity extends AppCompatActivity {
 
                         // If the device is not an Android TV, hide the status bar and the navigation bar
                         if (!isTV) {
-
+                            if (webClient.isFullScreen()) {
+                            webClient.onHideCustomView();
+                        } else {
+                                
                             if (!webView.canGoBack()) {
                                 //hideView(dialogBack);
                                 // create an array of items to display
@@ -1376,7 +1351,7 @@ public class MainActivity extends AppCompatActivity {
                                 hideView(dialogBack);
 
                                 break;
-
+                            
                             } else {
                                 if (isError) {
                                     // Set the error status to false
@@ -1391,7 +1366,16 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             }
                         }
-                        if (webClient.isFullScreen()) {
+                        }
+
+                timer = new Timer();
+                startTime = System.currentTimeMillis();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        //If the button is still pressed after one second, perform the different action
+                        if (System.currentTimeMillis() - startTime > 1000) {
+                            if (webClient.isFullScreen()) {
                             webClient.onHideCustomView();
                         } else {
                             // if (nocursor) {
@@ -1401,6 +1385,71 @@ public class MainActivity extends AppCompatActivity {
                             dialogBack.setVisibility(View.VISIBLE);
                             panelViews[row][column].requestFocus();
                         }
+                        }
+                    }
+                }, 1000);
+            } else if (action == KeyEvent.ACTION_UP) {
+                //Cancel the timer and check the duration
+                timer.cancel();
+                if (System.currentTimeMillis() - startTime <= 1000) {
+                    //If the button is released within one second, perform the normal action
+                    
+                           if (nocursor) {
+                            Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();   
+                            if (!webView.canGoBack()) {
+                                //hideView(dialogBack);
+                                // create an array of items to display
+                                new AlertDialog.Builder(this)
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .setTitle("Closing Application")
+                                        .setMessage("Are you sure you want to close this application?")
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // call the finish method to end the activity
+                                                finish();
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // cancel the dialog
+                                                dialog.cancel();
+                                                hideView(dialogBack);
+                                            }})
+                                        .show();
+                                hideView(dialogBack);
+
+                                break;
+                            
+                            } else {
+                                if (isError) {
+                                    // Set the error status to false
+                                    isError = false;
+                                    // Go back to the previous page in the WebView
+                                    webView.loadUrl(lastSuccessUrl);
+                                } else {
+                                    // Otherwise, call the super method
+                                    webView.goBack();
+                                }
+                                //webView.goBack();
+                                break;
+                            }
+                
+                           }else{
+                            if (webClient.isFullScreen()) {
+                            webClient.onHideCustomView();
+                        } else {
+                            // if (nocursor) {
+                            //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+
+                            //}
+                            dialogBack.setVisibility(View.VISIBLE);
+                            panelViews[row][column].requestFocus();
+                        }
+                               
+                           }
+                    
                         break;
 
                 }
