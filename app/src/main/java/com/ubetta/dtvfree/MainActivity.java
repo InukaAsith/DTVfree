@@ -1369,6 +1369,7 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
 
                                     if (!webView.canGoBack()) {
+                                        Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
                                         //hideView(dialogBack);
                                         // create an array of items to display
                                         new AlertDialog.Builder(this)
@@ -1397,10 +1398,12 @@ public class MainActivity extends AppCompatActivity {
                                             // Set the error status to false
                                             isError = false;
                                             // Go back to the previous page in the WebView
+                                            Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
                                             webView.loadUrl(lastSuccessUrl);
 
                                         } else {
                                             // Otherwise, call the super method
+                                            Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
                                             webView.goBack();
 
                                         }
@@ -1525,74 +1528,17 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                         }
+                        if (webClient.isFullScreen()) {
+                            webClient.onHideCustomView();
+                        } else {
+                            // if (nocursor) {
+                            //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
 
-
-
-                        if( nocursor) {
-
-                            if (webClient.isFullScreen()) {
-                                webClient.onHideCustomView();
-                                break;
-                            } else {
-                                // if (nocursor) {
-                                //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
-
-                                //}
-                                dialogBack.setVisibility(View.VISIBLE);
-                                panelViews[row][column].requestFocus();
-                            }
-                            break;
+                            //}
+                            dialogBack.setVisibility(View.VISIBLE);
+                            panelViews[row][column].requestFocus();
                         }
-                        else{
-                            if (webClient.isFullScreen()) {
-                                webClient.onHideCustomView();
-                            } else {
-
-                                if (!webView.canGoBack()) {
-                                    //hideView(dialogBack);
-                                    // create an array of items to display
-                                    new AlertDialog.Builder(this)
-                                            .setIcon(android.R.drawable.ic_dialog_alert)
-                                            .setTitle("Closing Application")
-                                            .setMessage("Are you sure you want to close this application?")
-                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    // call the finish method to end the activity
-                                                    finish();
-                                                }
-                                            })
-                                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    // cancel the dialog
-                                                    dialog.cancel();
-                                                    hideView(dialogBack);
-                                                }})
-                                            .show();
-                                    hideView(dialogBack);
-
-                                    break;
-
-                                } else {
-                                    if (isError) {
-                                        // Set the error status to false
-                                        isError = false;
-                                        // Go back to the previous page in the WebView
-                                        webView.loadUrl(lastSuccessUrl);
-                                    } else {
-                                        // Otherwise, call the super method
-                                        Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
-                                        webView.goBack();
-
-                                    }
-                                    //webView.goBack();
-                                    break;
-                                }
-                            }
-
-
-                        }
+                        break;
 
                 }
 
