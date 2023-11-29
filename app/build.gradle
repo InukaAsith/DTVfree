@@ -26,5 +26,6 @@ dependencies {
 
     implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation "androidx.webkit:webkit:1.6.0"
 
 }
