@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView mousePointer;
     private  CountDownTimer pointerVisibilityTimer;
+    private  CountDownTimer backmenutimer;
     Timer pointerMoveTimer;
     private  int velocityX = 0,velocityY = 0,keyCode;
     private  int screenWidth,screenHeight;
@@ -102,17 +103,19 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_REQUEST_DOWNLOAD);
         }
     }
-    private String homePage = "https://datafreetv.live/";
-    private String helppage = "https://telegra.ph/Help-Memu-11-22";
+    private final String homePage = "https://datafreetv.live/";
+    private final String helppage = "https://telegra.ph/Help-Memu-11-22";
 
-    private String site1 = "https://datafreetv.live/dtv.html";
-    private String site2 = "https://datafreetv.live/peotvgo.html";
+    private final String site1 = "https://datafreetv.live/dtv.html";
+    private final String site2 = "https://datafreetv.live/peotvgo.html";
     private boolean nocursor = false;
-    private String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
-    private String version = "v4.3.2";
+    private final String sourcecode = "https://github.com/InukaAsith/DTVfree/releases";
+    private final String version = "v4.3.2";
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     private boolean isError; // A flag to indicate if there is an error
-    private boolean isdarkm = false; 
+    private boolean isdarkm = false;
+    private boolean isLongPressDone = false;
+
     private String lastSuccessUrl;
 
     @Override
@@ -241,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String offsite1 = webView.getUrl();
                 boolean issitethere1 = sitelist.getBoolean(offsite1, false);
-                if (issitethere1 != false) {
+                if (issitethere1) {
 
                     if (offsite1 != null) {
                         sitelist.edit().putBoolean(offsite1, false).apply();
@@ -451,17 +454,17 @@ public class MainActivity extends AppCompatActivity {
                 String offmode = "Enable/Disable";
                 String enpip = "Enable/Disable";
                 String endark = "Enable/Disable";
-                if (site1load == false || site2load == false || site3load == false ){
+                if (!site1load || !site2load || !site3load){
                     offmode = "Enable";
                 }else{
                     offmode = "Disable";
                 }
-                if (pipm == true){
+                if (pipm){
                     enpip = "Disable";
                 }else{
                     enpip = "Enable";
                 }
-                if (darkm == true){
+                if (darkm){
                     endark = "Disable";
                 }else{
                     endark = "Enable";
@@ -484,7 +487,7 @@ public class MainActivity extends AppCompatActivity {
                             case 1:
                                 webView.clearCache (true);
                                 Toast.makeText(MainActivity.this, "Cleaned all saved website data. Reload websites to load the latest versions of sites", Toast.LENGTH_SHORT).show();
-
+                                webView.reload();
                                 hideView(dialogBack);
                                 // do something for button 4
                                 break;
@@ -511,6 +514,7 @@ public class MainActivity extends AppCompatActivity {
                                             editor.putString("homepage", homestr);
                                             editor.apply();
                                             Toast.makeText(MainActivity.this, "Homepage set to " + homestr + "Please restart application in order for changes to take effect", Toast.LENGTH_SHORT).show();
+
                                         }
                                         else if (value.toLowerCase().indexOf(webqr.toLowerCase()) != -1) {
                                             String homestr = ("https://" + value);
@@ -544,7 +548,7 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
                             case 3:
-                                if (site1load == false || site2load == false || site3load == false ){
+                                if (!site1load || !site2load || !site3load){
                                     Toast.makeText(MainActivity.this, "Enabled offline loading ", Toast.LENGTH_SHORT).show();
 
                                     sitelist0.edit().putBoolean(site1, true ).apply();
@@ -575,7 +579,7 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case 4:
 
-                                if (pipm == true){
+                                if (pipm){
                                     pipmode.edit().putBoolean("pip", false ).apply();
                                     Toast.makeText(MainActivity.this, "Disabled Background Play", Toast.LENGTH_SHORT).show();
 
@@ -595,13 +599,15 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
                            case 5:
-                                if (darkm == true){
+                                if (darkm){
                                     darkmod.edit().putBoolean("darkmode", false ).apply();
                                     Toast.makeText(MainActivity.this, "Disabled Darkmode", Toast.LENGTH_SHORT).show();
+
 
                                 }else{
                                     darkmod.edit().putBoolean("darkmode", true ).apply();
                                     Toast.makeText(MainActivity.this, "Enabled Darkmode", Toast.LENGTH_SHORT).show();
+
                                 }
                                 hideView(dialogBack);
                                 
@@ -754,10 +760,11 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setDisplayZoomControls(false);
         webSettings.setLoadWithOverviewMode(true);
         if (darkmode){
-            
-                if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-                    WebSettingsCompat.setAlgorithmicDarkeningAllowed(webView.getSettings(), true);
-                }
+
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                //Set the force dark mode to on
+                WebSettingsCompat.setForceDark(webView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
+            }
 
         }
 
@@ -838,7 +845,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Check if the device is an Android TV
                 boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
-             //   if (!isTV) {
+
                     if (url.equals(homepge)) {
                         hab.setVisibility(View.GONE);
                         fab.setVisibility(View.VISIBLE);
@@ -847,8 +854,12 @@ public class MainActivity extends AppCompatActivity {
 
                         fab.setVisibility(View.GONE);
                         hab.setVisibility(View.VISIBLE);
+
+                        if (isTV) {
+                            hab.setVisibility(View.GONE);
+                            fab.setVisibility(View.GONE);
                     }
-             //   }
+                }
                 super.onPageStarted(view, url, favicon);
 
             }
@@ -867,7 +878,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 // If the device is not an Android TV, hide the status bar and the navigation bar
-              //  if (!isTV) {
+
 
                     if (url.equals(homepge)) {
                         hab.setVisibility(View.GONE);
@@ -876,8 +887,13 @@ public class MainActivity extends AppCompatActivity {
                         //Otherwise, hide the FAB
                         fab.setVisibility(View.GONE);
                         hab.setVisibility(View.VISIBLE);
+
+                        if (isTV) {
+                            hab.setVisibility(View.GONE);
+                            fab.setVisibility(View.GONE);
+                        }
                     }
-               // }
+
             }
 
             @Override
@@ -924,7 +940,7 @@ public class MainActivity extends AppCompatActivity {
 
             final InputStream emptyInputStream = new ByteArrayInputStream(new byte[0]);
 
-            String lastMainPage = "";
+            final String lastMainPage = "";
 
 
             @Override
@@ -945,15 +961,15 @@ public class MainActivity extends AppCompatActivity {
 
         webView.loadUrl(homepge);
         boolean loadsite1 = sitelist.getBoolean (site1, true);
-        if (loadsite1 != false){
+        if (loadsite1){
             sitelist.edit().putBoolean(site1, true).apply();
         }
         boolean loadsite2 = sitelist.getBoolean (site2, true);
-        if (loadsite2 != false){
+        if (loadsite2){
             sitelist.edit().putBoolean(site2, true).apply();
         }
         boolean loadsite3 = sitelist.getBoolean (homePage, true);
-        if (loadsite3 != false){
+        if (loadsite3){
             sitelist.edit().putBoolean(homePage, true).apply();
         }
 
@@ -1079,7 +1095,7 @@ public class MainActivity extends AppCompatActivity {
         // enable web storage
         webSettings.setDomStorageEnabled(true);
 
-        webView.loadUrl(url);;
+        webView.loadUrl(url);
 
     }
 
@@ -1128,7 +1144,7 @@ public class MainActivity extends AppCompatActivity {
         super.onUserLeaveHint();
         SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
         boolean pipm = pipmode.getBoolean ("pip", true);
-        if (pipm == true){
+        if (pipm){
             hab.setVisibility(View.GONE);
             // Enter PIP mode when the user leaves the app and the webview is showing a video in full screen mode
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && webClient.isVideoFullScreen()) {
@@ -1294,50 +1310,123 @@ public class MainActivity extends AppCompatActivity {
         mousePointer.setY(y);
     }
 
-    @Override
-    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
-        PackageManager pm = getPackageManager();
 
-        // Check if the device is an Android TV
-        boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
-
-        // If the device is not an Android TV, hide the status bar and the navigation bar
-        if (isTV) {
-            switch (keyCode) {
-
-                case KeyEvent.KEYCODE_BACK:
-                    //Perform the different action
-                    if (webClient.isFullScreen()) {
-                        webClient.onHideCustomView();
-                    } else {
-                        // if (nocursor) {
-                        //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
-
-                        //}
-                        dialogBack.setVisibility(View.VISIBLE);
-                        panelViews[row][column].requestFocus();
-                    }
-
-                    return true;
-                default:
-                    return super.onKeyLongPress(keyCode, event);
-
-            }
-        }else{
-            return super.onKeyLongPress(keyCode, event);
-        }
-    }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
 
         SharedPreferences sharedPref = getSharedPreferences("myPref", MODE_PRIVATE);
         keyCode = event.getKeyCode();
+        PackageManager pm = getPackageManager();
+
+        // Check if the device is an Android TV
+        boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
+        if (nocursor && isTV && keyCode == KeyEvent.KEYCODE_BACK ){
+                int action = event.getAction();
+                        if (action == KeyEvent.ACTION_DOWN) {
+                            if (pointerMoveTimer != null) {
+                                pointerMoveTimer.cancel();
+                            }
+                            if (pointerVisibilityTimer != null) {
+                                pointerVisibilityTimer.cancel();
+                            }
+                            //Create a CountDownTimer object with a duration of 1000 milliseconds and an interval of 1000 milliseconds
+                            backmenutimer = new CountDownTimer(1000, 1000) {
+                                @Override
+                                public void onTick(long millisUntilFinished) {
+                                    //Do nothing on tick
+                                }
+
+                                @Override
+                                public void onFinish() {
+                                    //If the button is still pressed after one second, perform the long press action
+                                    if (webClient.isFullScreen()) {
+                                        webClient.onHideCustomView();
+
+                                    } else {
+                                        // if (nocursor) {
+                                        //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+
+                                        //}
+                                        dialogBack.setVisibility(View.VISIBLE);
+                                        panelViews[row][column].requestFocus();
+                                    }
+                                    //Set the long press action flag to true
+                                    isLongPressDone = true;
+
+                                }
+                            }.start();
+                            //Start the CountDownTimer object
+
+                        } else if (action == KeyEvent.ACTION_UP) {
+                            //Cancel the CountDownTimer object
+                            backmenutimer.cancel();
+                            //If the button is released within one second, perform the normal action only if the long press action flag is false
+                            if (!isLongPressDone) {
+                                if (webClient.isFullScreen()) {
+                                    webClient.onHideCustomView();
+
+                                } else {
+
+                                    if (!webView.canGoBack()) {
+                                        //hideView(dialogBack);
+                                        // create an array of items to display
+                                        new AlertDialog.Builder(this)
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .setTitle("Closing Application")
+                                                .setMessage("Are you sure you want to close this application?")
+                                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // call the finish method to end the activity
+                                                        finish();
+                                                    }
+                                                })
+                                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // cancel the dialog
+                                                        dialog.cancel();
+                                                        hideView(dialogBack);
+                                                    }})
+                                                .show();
+                                        hideView(dialogBack);
+
+                                    } else {
+                                        if (isError) {
+                                            // Set the error status to false
+                                            isError = false;
+                                            // Go back to the previous page in the WebView
+                                            webView.loadUrl(lastSuccessUrl);
+
+                                        } else {
+                                            // Otherwise, call the super method
+                                            webView.goBack();
+
+                                        }
+                                        //webView.goBack();
+
+                                    }
+                                }
+                            }
+                            //Reset the long press action flag
+                            isLongPressDone = false;
+                        }
+                        return true;
+
+
+
+
+
+
+        }
+
         if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_BACK || keyCode ==  KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 
             if (dialogBack.getVisibility() == View.VISIBLE && event.getAction() != KeyEvent.ACTION_UP) {
                 dialogEvent(keyCode);
             } else {//Dialog not visible
+
                 if (nocursor) {
                     // return super.dispatchKeyEvent(event);
                     if (keyCode != KeyEvent.KEYCODE_BACK){
@@ -1358,11 +1447,11 @@ public class MainActivity extends AppCompatActivity {
                     velocityY = 0;
                     pointerVisibilityTimer = new CountDownTimer(3 * 1000, 1000) {
                         @Override
-                        public final void onTick(final long millisUntilFinished) {
+                        public void onTick(final long millisUntilFinished) {
                         }
 
                         @Override
-                        public final void onFinish() {
+                        public void onFinish() {
                             mousePointer.setVisibility(View.GONE);
                         }
                     }.start();
@@ -1384,15 +1473,13 @@ public class MainActivity extends AppCompatActivity {
                                 MotionEvent.ACTION_UP, x, y, 0));
                         break;
                     case KeyEvent.KEYCODE_BACK:
-                        PackageManager pm = getPackageManager();
 
-                        // Check if the device is an Android TV
-                        boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
 
                         // If the device is not an Android TV, hide the status bar and the navigation bar
                         if (!isTV) {
                             if (webClient.isFullScreen()) {
                             webClient.onHideCustomView();
+                            break;
                         } else {
                                 
                             if (!webView.canGoBack()) {
@@ -1427,9 +1514,11 @@ public class MainActivity extends AppCompatActivity {
                                     isError = false;
                                     // Go back to the previous page in the WebView
                                     webView.loadUrl(lastSuccessUrl);
+                                    break;
                                 } else {
                                     // Otherwise, call the super method
                                     webView.goBack();
+
                                 }
                                 //webView.goBack();
                                 break;
@@ -1437,10 +1526,13 @@ public class MainActivity extends AppCompatActivity {
                         }
                         }
 
-                        if( nocursor != true) {
+
+
+                        if( nocursor) {
 
                             if (webClient.isFullScreen()) {
                                 webClient.onHideCustomView();
+                                break;
                             } else {
                                 // if (nocursor) {
                                 //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
@@ -1455,7 +1547,7 @@ public class MainActivity extends AppCompatActivity {
                             if (webClient.isFullScreen()) {
                                 webClient.onHideCustomView();
                             } else {
-                                Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
+
                                 if (!webView.canGoBack()) {
                                     //hideView(dialogBack);
                                     // create an array of items to display
@@ -1490,6 +1582,7 @@ public class MainActivity extends AppCompatActivity {
                                         webView.loadUrl(lastSuccessUrl);
                                     } else {
                                         // Otherwise, call the super method
+                                        Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
                                         webView.goBack();
 
                                     }
