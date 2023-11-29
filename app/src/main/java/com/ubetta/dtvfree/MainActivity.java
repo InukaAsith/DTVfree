@@ -749,14 +749,16 @@ public class MainActivity extends AppCompatActivity {
         //webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         webSettings.setDatabaseEnabled(true);
         webSettings.setDomStorageEnabled(true);
+        webSettings.setSupportMultipleWindows(true);
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setLoadWithOverviewMode(true);
         if (darkmode){
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
-        //Set the force dark mode to on
-            WebSettingsCompat.setForceDark(webView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
-            }
+            
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+                    WebSettingsCompat.setAlgorithmicDarkeningAllowed(webView.getSettings(), true);
+                }
+
         }
 
         // get a SharedPreferences object with the name “saved_sites”
@@ -940,7 +942,7 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        webView.getSettings().setSupportMultipleWindows(false);
+
         webView.loadUrl(homepge);
         boolean loadsite1 = sitelist.getBoolean (site1, true);
         if (loadsite1 != false){
