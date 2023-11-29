@@ -65,6 +65,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.webkit.WebSettingsCompat;
+import androidx.webkit.WebViewFeature;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -439,7 +441,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 SharedPreferences pipmode = getSharedPreferences ("pip_mode", MODE_PRIVATE);
                 SharedPreferences darkmod = getSharedPreferences ("myPref", MODE_PRIVATE);
-
+                boolean darkm = darkmod.getBoolean ("darkmode", isdarkm);
                 boolean pipm = pipmode.getBoolean ("pip", false);
                 SharedPreferences sitelist0 = getSharedPreferences ("saved_sites", MODE_PRIVATE);
 
@@ -459,7 +461,7 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     enpip = "Enable";
                 }
-               if (darkmod == true){
+                if (darkm == true){
                     endark = "Disable";
                 }else{
                     endark = "Enable";
@@ -593,7 +595,7 @@ public class MainActivity extends AppCompatActivity {
                                 break;
 
                            case 5:
-                                if (darkmod == true){
+                                if (darkm == true){
                                     darkmod.edit().putBoolean("darkmode", false ).apply();
                                     Toast.makeText(MainActivity.this, "Disabled Darkmode", Toast.LENGTH_SHORT).show();
 
@@ -1289,6 +1291,41 @@ public class MainActivity extends AppCompatActivity {
         mousePointer.setX(x);
         mousePointer.setY(y);
     }
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        PackageManager pm = getPackageManager();
+
+        // Check if the device is an Android TV
+        boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
+
+        // If the device is not an Android TV, hide the status bar and the navigation bar
+        if (isTV) {
+            switch (keyCode) {
+
+                case KeyEvent.KEYCODE_BACK:
+                    //Perform the different action
+                    if (webClient.isFullScreen()) {
+                        webClient.onHideCustomView();
+                    } else {
+                        // if (nocursor) {
+                        //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+
+                        //}
+                        dialogBack.setVisibility(View.VISIBLE);
+                        panelViews[row][column].requestFocus();
+                    }
+
+                    return true;
+                default:
+                    return super.onKeyLongPress(keyCode, event);
+
+            }
+        }else{
+            return super.onKeyLongPress(keyCode, event);
+        }
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
 
@@ -1398,91 +1435,72 @@ public class MainActivity extends AppCompatActivity {
                         }
                         }
 
-                timer = new Timer();
-                startTime = System.currentTimeMillis();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        //If the button is still pressed after one second, perform the different action
-                        if (System.currentTimeMillis() - startTime > 1000) {
+                        if( nocursor != true) {
+
                             if (webClient.isFullScreen()) {
-                            webClient.onHideCustomView();
-                        } else {
-                            // if (nocursor) {
-                            //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
-
-                            //}
-                            dialogBack.setVisibility(View.VISIBLE);
-                            panelViews[row][column].requestFocus();
-                        }
-                        }
-                    }
-                }, 1000);
-            } else if (action == KeyEvent.ACTION_UP) {
-                //Cancel the timer and check the duration
-                timer.cancel();
-                if (System.currentTimeMillis() - startTime <= 1000) {
-                    //If the button is released within one second, perform the normal action
-                    
-                           if (nocursor) {
-                            Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();   
-                            if (!webView.canGoBack()) {
-                                //hideView(dialogBack);
-                                // create an array of items to display
-                                new AlertDialog.Builder(this)
-                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                        .setTitle("Closing Application")
-                                        .setMessage("Are you sure you want to close this application?")
-                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                // call the finish method to end the activity
-                                                finish();
-                                            }
-                                        })
-                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                // cancel the dialog
-                                                dialog.cancel();
-                                                hideView(dialogBack);
-                                            }})
-                                        .show();
-                                hideView(dialogBack);
-
-                                break;
-                            
+                                webClient.onHideCustomView();
                             } else {
-                                if (isError) {
-                                    // Set the error status to false
-                                    isError = false;
-                                    // Go back to the previous page in the WebView
-                                    webView.loadUrl(lastSuccessUrl);
-                                } else {
-                                    // Otherwise, call the super method
-                                    webView.goBack();
-                                }
-                                //webView.goBack();
-                                break;
-                            }
-                
-                           }else{
-                            if (webClient.isFullScreen()) {
-                            webClient.onHideCustomView();
-                        } else {
-                            // if (nocursor) {
-                            //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+                                // if (nocursor) {
+                                //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
 
-                            //}
-                            dialogBack.setVisibility(View.VISIBLE);
-                            panelViews[row][column].requestFocus();
+                                //}
+                                dialogBack.setVisibility(View.VISIBLE);
+                                panelViews[row][column].requestFocus();
+                            }
+                            break;
                         }
-                               
-                           }
-                    
-                        break;
+                        else{
+                            if (webClient.isFullScreen()) {
+                                webClient.onHideCustomView();
+                            } else {
+                                Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
+                                if (!webView.canGoBack()) {
+                                    //hideView(dialogBack);
+                                    // create an array of items to display
+                                    new AlertDialog.Builder(this)
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .setTitle("Closing Application")
+                                            .setMessage("Are you sure you want to close this application?")
+                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // call the finish method to end the activity
+                                                    finish();
+                                                }
+                                            })
+                                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // cancel the dialog
+                                                    dialog.cancel();
+                                                    hideView(dialogBack);
+                                                }})
+                                            .show();
+                                    hideView(dialogBack);
+
+                                    break;
+
+                                } else {
+                                    if (isError) {
+                                        // Set the error status to false
+                                        isError = false;
+                                        // Go back to the previous page in the WebView
+                                        webView.loadUrl(lastSuccessUrl);
+                                    } else {
+                                        // Otherwise, call the super method
+                                        webView.goBack();
+
+                                    }
+                                    //webView.goBack();
+                                    break;
+                                }
+                            }
+
+
+                        }
 
                 }
+
                 if (firstDown) {
                     firstDown = false;
                     pointerMoveTimer = new Timer();
