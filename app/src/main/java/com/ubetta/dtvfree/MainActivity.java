@@ -1321,7 +1321,108 @@ public class MainActivity extends AppCompatActivity {
 
         // Check if the device is an Android TV
         boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
+        if (nocursor && isTV && keyCode == KeyEvent.KEYCODE_BACK){
+            int action = event.getAction();
+            if (action == KeyEvent.ACTION_DOWN) {
+                if (pointerMoveTimer != null) {
+                    pointerMoveTimer.cancel();
+                }
+                if (pointerVisibilityTimer != null) {
+                    pointerVisibilityTimer.cancel();
+                }
+                //Create a CountDownTimer object with a duration of 1000 milliseconds and an interval of 1000 milliseconds
+                backmenutimer = new CountDownTimer(1000, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        //Do nothing on tick
+                    }
 
+                    @Override
+                    public void onFinish() {
+                        //If the button is still pressed after one second, perform the long press action
+                        if (webClient.isFullScreen()) {
+                            webClient.onHideCustomView();
+
+                        } else {
+                            // if (nocursor) {
+                            //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+
+                            //}
+                            dialogBack.setVisibility(View.VISIBLE);
+                            panelViews[row][column].requestFocus();
+                        }
+                        //Set the long press action flag to true
+                        isLongPressDone = true;
+
+                    }
+                }.start();
+                //Start the CountDownTimer object
+
+            } else if (action == KeyEvent.ACTION_UP) {
+                //Cancel the CountDownTimer object
+                backmenutimer.cancel();
+                //If the button is released within one second, perform the normal action only if the long press action flag is false
+                if (!isLongPressDone) {
+                    if (webClient.isFullScreen()) {
+                        webClient.onHideCustomView();
+
+                    } else {
+
+                        if (!webView.canGoBack()) {
+                            Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
+                            //hideView(dialogBack);
+                            // create an array of items to display
+                            new AlertDialog.Builder(this)
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setTitle("Closing Application")
+                                    .setMessage("Are you sure you want to close this application?")
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // call the finish method to end the activity
+                                            finish();
+                                        }
+                                    })
+                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // cancel the dialog
+                                            dialog.cancel();
+                                            hideView(dialogBack);
+                                        }})
+                                    .show();
+                            hideView(dialogBack);
+
+                        } else {
+                            if (isError) {
+                                // Set the error status to false
+                                isError = false;
+                                // Go back to the previous page in the WebView
+                                Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
+                                webView.loadUrl(lastSuccessUrl);
+
+                            } else {
+                                // Otherwise, call the super method
+                                Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
+                                webView.goBack();
+
+                            }
+                            //webView.goBack();
+
+                        }
+                    }
+                }
+                //Reset the long press action flag
+                isLongPressDone = false;
+            }
+            return true;
+
+
+
+
+
+
+        }
 
         if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_BACK || keyCode ==  KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 
@@ -1339,108 +1440,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 }
-                if (nocursor && isTV){
-                    int action = event.getAction();
-                    if (action == KeyEvent.ACTION_DOWN) {
-                        if (pointerMoveTimer != null) {
-                            pointerMoveTimer.cancel();
-                        }
-                        if (pointerVisibilityTimer != null) {
-                            pointerVisibilityTimer.cancel();
-                        }
-                        //Create a CountDownTimer object with a duration of 1000 milliseconds and an interval of 1000 milliseconds
-                        backmenutimer = new CountDownTimer(1000, 1000) {
-                            @Override
-                            public void onTick(long millisUntilFinished) {
-                                //Do nothing on tick
-                            }
 
-                            @Override
-                            public void onFinish() {
-                                //If the button is still pressed after one second, perform the long press action
-                                if (webClient.isFullScreen()) {
-                                    webClient.onHideCustomView();
-
-                                } else {
-                                    // if (nocursor) {
-                                    //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
-
-                                    //}
-                                    dialogBack.setVisibility(View.VISIBLE);
-                                    panelViews[row][column].requestFocus();
-                                }
-                                //Set the long press action flag to true
-                                isLongPressDone = true;
-
-                            }
-                        }.start();
-                        //Start the CountDownTimer object
-
-                    } else if (action == KeyEvent.ACTION_UP) {
-                        //Cancel the CountDownTimer object
-                        backmenutimer.cancel();
-                        //If the button is released within one second, perform the normal action only if the long press action flag is false
-                        if (!isLongPressDone) {
-                            if (webClient.isFullScreen()) {
-                                webClient.onHideCustomView();
-
-                            } else {
-
-                                if (!webView.canGoBack()) {
-                                    Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
-                                    //hideView(dialogBack);
-                                    // create an array of items to display
-                                    new AlertDialog.Builder(this)
-                                            .setIcon(android.R.drawable.ic_dialog_alert)
-                                            .setTitle("Closing Application")
-                                            .setMessage("Are you sure you want to close this application?")
-                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    // call the finish method to end the activity
-                                                    finish();
-                                                }
-                                            })
-                                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    // cancel the dialog
-                                                    dialog.cancel();
-                                                    hideView(dialogBack);
-                                                }})
-                                            .show();
-                                    hideView(dialogBack);
-
-                                } else {
-                                    if (isError) {
-                                        // Set the error status to false
-                                        isError = false;
-                                        // Go back to the previous page in the WebView
-                                        Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
-                                        webView.loadUrl(lastSuccessUrl);
-
-                                    } else {
-                                        // Otherwise, call the super method
-                                        Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
-                                        webView.goBack();
-
-                                    }
-                                    //webView.goBack();
-
-                                }
-                            }
-                        }
-                        //Reset the long press action flag
-                        isLongPressDone = false;
-                    }
-                    return true;
-
-
-
-
-
-
-                }
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     if (pointerMoveTimer != null) {
                         pointerMoveTimer.cancel();
