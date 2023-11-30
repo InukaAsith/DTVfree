@@ -44,6 +44,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 
+import android.webkit.JavascriptInterface;
 import android.webkit.URLUtil;
 
 import android.webkit.WebResourceRequest;
@@ -152,6 +153,31 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sitelist = getSharedPreferences ("saved_sites", MODE_PRIVATE);
 
 // if yes, show the popup message
+
+
+        // Define the custom JavaScript interface class
+        class MyJavaScriptInterface {
+            // Define a method to play or pause the video
+            @JavascriptInterface
+            public void playOrPause () {
+                // Get the video element from the webview
+                webView.loadUrl ("javascript:var video = document.querySelector('video');");
+                // Toggle the playback state
+                webView.loadUrl ("javascript:if (video.paused) { video.play(); } else { video.pause(); }");
+            }
+
+            // Define a method to seek forward or backward the video
+            @JavascriptInterface
+            public void seek (int seconds) {
+                // Get the video element from the webview
+                webView.loadUrl ("javascript:var video = document.querySelector('video');");
+                // Seek the video by the given seconds
+                webView.loadUrl ("javascript:video.currentTime += " + seconds + ";");
+            }
+        }
+
+// Add the custom JavaScript interface to the webview
+
 
         if (isFirstTime) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -744,7 +770,7 @@ public class MainActivity extends AppCompatActivity {
         ProgressBar loadingIndicator = findViewById(R.id.loading_indicator);
         webView.setWebViewClient(browser = new Browser(searchBar,webView));
         webView.setWebChromeClient(webClient = new WebClient(this));
-
+        webView.addJavascriptInterface (new MyJavaScriptInterface (), "MyJSInterface");
         WebSettings webSettings = webView.getSettings();
         webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         webSettings.setAllowUniversalAccessFromFileURLs(true);
@@ -755,7 +781,7 @@ public class MainActivity extends AppCompatActivity {
         //webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         webSettings.setDatabaseEnabled(true);
         webSettings.setDomStorageEnabled(true);
-        webSettings.setSupportMultipleWindows(false);
+        webSettings.setSupportMultipleWindows(true);
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setLoadWithOverviewMode(true);
@@ -842,7 +868,7 @@ public class MainActivity extends AppCompatActivity {
                 // Show the loading indicator when the webview starts loading
                 loadingIndicator.setVisibility(View.VISIBLE);
                 PackageManager pm = getPackageManager();
-
+                view.evaluateJavascript(getScript1(), null);
                 // Check if the device is an Android TV
                 boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
 
@@ -876,7 +902,7 @@ public class MainActivity extends AppCompatActivity {
                 //Assuming you have a WebView object named webView
                 //webView.evaluateJavascript("document.getElementById('fullscreenButton').click();", null);
 
-
+                view.evaluateJavascript(getScript1(), null);
                 // If the device is not an Android TV, hide the status bar and the navigation bar
 
 
@@ -981,6 +1007,11 @@ public class MainActivity extends AppCompatActivity {
         panelViews[row][column].setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.voice_button_focus_background));
 
     }
+
+    private String getScript1() {
+        return "var videos = document.querySelectorAll('video'); for (var i = 0; i < videos.length; i++) { var video = videos[i]; video.addEventListener('play', function() { if (video.webkitEnterFullscreen) { video.webkitEnterFullscreen(); } }); }";
+    }
+
     @Override
     public void onConfigurationChanged (Configuration newConfig) {
         super.onConfigurationChanged (newConfig);
@@ -1431,15 +1462,37 @@ public class MainActivity extends AppCompatActivity {
             } else {//Dialog not visible
 
                 if (nocursor) {
-                    // return super.dispatchKeyEvent(event);
-                    if (keyCode != KeyEvent.KEYCODE_BACK){
-                        return super.dispatchKeyEvent(event);
-                        //dialogBack.setVisibility(View.VISIBLE);
-                        //panelViews[row][column].requestFocus();
 
+                    // return super.dispatchKeyEvent(event);
+                    if (webClient.isimFullScreen() && keyCode != KeyEvent.KEYCODE_BACK && isTV) {
+
+
+                        switch (keyCode) {
+                            // If the play/pause key is pressed
+                            case KeyEvent.KEYCODE_DPAD_CENTER:
+                                // Call the playOrPause method of the custom JavaScript interface
+                                webView.loadUrl("javascript:MyJSInterface.playOrPause ();");
+                                return true;
+                            // If the forward key is pressed
+                            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                                // Call the seek method of the custom JavaScript interface with 10 seconds
+                                webView.loadUrl("javascript:MyJSInterface.seek (10);");
+                                return true;
+                            // If the rewind key is pressed
+                            case KeyEvent.KEYCODE_DPAD_LEFT:
+                                // Call the seek method of the custom JavaScript interface with -10 seconds
+                                webView.loadUrl("javascript:MyJSInterface.seek (-10);");
+                                return true;
+                            // If any other key is pressed
+                            default:
+                                // Do nothing
+                                return super.dispatchKeyEvent(event);
+
+                        }
                     }
 
-                }
+
+                    }
 
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     if (pointerMoveTimer != null) {
