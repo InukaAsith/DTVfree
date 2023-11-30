@@ -161,18 +161,18 @@ public class MainActivity extends AppCompatActivity {
             @JavascriptInterface
             public void playOrPause () {
                 // Get the video element from the webview
-                webView.loadUrl ("javascript:var video = document.querySelector('video');");
+                webView.evaluateJavascript ("var video = document.querySelector('video');", null);
                 // Toggle the playback state
-                webView.loadUrl ("javascript:if (video.paused) { video.play(); } else { video.pause(); }");
+                webView.evaluateJavascript ("if (video.paused) { video.play(); } else { video.pause(); }", null);
             }
 
             // Define a method to seek forward or backward the video
             @JavascriptInterface
             public void seek (int seconds) {
                 // Get the video element from the webview
-                webView.loadUrl ("javascript:var video = document.querySelector('video');");
+                webView.evaluateJavascript ("var video = document.querySelector('video');", null);
                 // Seek the video by the given seconds
-                webView.loadUrl ("javascript:video.currentTime += " + seconds + ";");
+                webView.evaluateJavascript ("video.currentTime += " + seconds + ";", null);
             }
         }
 
@@ -868,7 +868,7 @@ public class MainActivity extends AppCompatActivity {
                 // Show the loading indicator when the webview starts loading
                 loadingIndicator.setVisibility(View.VISIBLE);
                 PackageManager pm = getPackageManager();
-                
+
                 // Check if the device is an Android TV
                 boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
 
