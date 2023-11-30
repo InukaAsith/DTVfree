@@ -16,7 +16,7 @@ public class WebClient extends WebChromeClient {
     private MainActivity mainActivity;
     private boolean fullScreen = false;
     private boolean isVideoFullScreen = false;
-
+    private boolean ImmFullScreen = false;
     // Add a Bundle variable to store the state of the webview
 
 
@@ -27,7 +27,9 @@ public class WebClient extends WebChromeClient {
     public boolean isFullScreen() {
         return fullScreen;
     }
-
+    public boolean isimFullScreen() {
+        return ImmFullScreen;
+    }
     public Bitmap getDefaultVideoPoster() {
         if (mainActivity == null) {
             return null;
@@ -38,6 +40,7 @@ public class WebClient extends WebChromeClient {
     public void onHideCustomView() {
         fullScreen = false;
         isVideoFullScreen = false;
+        ImmFullScreen = false;
         ((FrameLayout) mainActivity.getWindow().getDecorView()).removeView(this.mCustomView);
         this.mCustomView = null;
         mainActivity.getWindow().getDecorView().setSystemUiVisibility(this.mOriginalSystemUiVisibility);
@@ -75,6 +78,7 @@ public class WebClient extends WebChromeClient {
                             | View.SYSTEM_UI_FLAG_IMMERSIVE);
         } else {
             isVideoFullScreen = false;
+            ImmFullScreen = true;
             mainActivity.getWindow().getDecorView().setSystemUiVisibility(3846);
             this.mCustomViewCallback.onCustomViewHidden();
         }
