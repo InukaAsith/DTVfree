@@ -156,25 +156,27 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Define the custom JavaScript interface class
-        class MyJavaScriptInterface {
-            // Define a method to play or pause the video
-            @JavascriptInterface
-            public void playOrPause () {
-                // Get the video element from the webview
-                webView.loadUrl ("javascript:var video = document.querySelector('video');");
-                // Toggle the playback state
-                webView.loadUrl ("javascript:if (video.paused) { video.play(); } else { video.pause(); }");
-            }
 
-            // Define a method to seek forward or backward the video
-            @JavascriptInterface
-            public void seek (int seconds) {
-                // Get the video element from the webview
-                webView.loadUrl ("javascript:var video = document.querySelector('video');");
-                // Seek the video by the given seconds
-                webView.loadUrl ("javascript:video.currentTime += " + seconds + ";");
-            }
-        }
+
+        class MyJavaScriptInterface {
+  // Define a method to play or pause the video
+  @JavascriptInterface
+  public void playOrPause () {
+    // Get the video element from the webview
+    webView.evaluateJavascript ("var video = document.querySelector('video');", null);
+    // Toggle the playback state
+    webView.evaluateJavascript ("if (video.paused) { video.play(); } else { video.pause(); }", null);
+  }
+
+  // Define a method to seek forward or backward the video
+  @JavascriptInterface
+  public void seek (int seconds) {
+    // Get the video element from the webview
+    webView.evaluateJavascript ("var video = document.querySelector('video');", null);
+    // Seek the video by the given seconds
+    webView.evaluateJavascript ("video.currentTime += " + seconds + ";", null);
+  }
+}
 
 // Add the custom JavaScript interface to the webview
 
@@ -1468,28 +1470,27 @@ public class MainActivity extends AppCompatActivity {
 
 
                         switch (keyCode) {
-                            // If the play/pause key is pressed
-                            case KeyEvent.KEYCODE_DPAD_CENTER:
-                                // Call the playOrPause method of the custom JavaScript interface
-                                webView.loadUrl("javascript:MyJSInterface.playOrPause ();");
-                                return true;
-                            // If the forward key is pressed
-                            case KeyEvent.KEYCODE_DPAD_RIGHT:
-                                // Call the seek method of the custom JavaScript interface with 10 seconds
-                                webView.loadUrl("javascript:MyJSInterface.seek (10);");
-                                return true;
-                            // If the rewind key is pressed
-                            case KeyEvent.KEYCODE_DPAD_LEFT:
-                                // Call the seek method of the custom JavaScript interface with -10 seconds
-                                webView.loadUrl("javascript:MyJSInterface.seek (-10);");
-                                return true;
-                            // If any other key is pressed
-                            default:
-                                // Do nothing
-                                return super.dispatchKeyEvent(event);
+  // If the play/pause key is pressed
+  case KeyEvent.KEYCODE_DPAD_CENTER:
+    // Call the playOrPause method of the custom JavaScript interface
+    webView.evaluateJavascript("MyJSInterface.playOrPause ();", null);
+    return true;
+  // If the forward key is pressed
+  case KeyEvent.KEYCODE_DPAD_RIGHT:
+    // Call the seek method of the custom JavaScript interface with 10 seconds
+    webView.evaluateJavascript("MyJSInterface.seek (10);", null);
+    return true;
+  // If the rewind key is pressed
+  case KeyEvent.KEYCODE_DPAD_LEFT:
+    // Call the seek method of the custom JavaScript interface with -10 seconds
+    webView.evaluateJavascript("MyJSInterface.seek (-10);", null);
+    return true;
+  // If any other key is pressed
+  default:
+    // Do nothing
+    return super.dispatchKeyEvent(event);
+}
 
-                        }
-                    }
 
 
                     }
