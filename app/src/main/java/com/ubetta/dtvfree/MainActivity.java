@@ -135,11 +135,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 //Check if the system dark mode is on
-       int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-       if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
-    //Check if the force dark feature is supported
-         isdarkm = true;
-       }    
+        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+            //Check if the force dark feature is supported
+            isdarkm = true;
+        }
 
         // get your string from SharedPreferences
         String homepge = sharedPref.getString("homepage", homePage);
@@ -159,24 +159,24 @@ public class MainActivity extends AppCompatActivity {
 
 
         class MyJavaScriptInterface {
-  // Define a method to play or pause the video
-  @JavascriptInterface
-  public void playOrPause () {
-    // Get the video element from the webview
-    webView.evaluateJavascript ("var video = document.querySelector('video');", null);
-    // Toggle the playback state
-    webView.evaluateJavascript ("if (video.paused) { video.play(); } else { video.pause(); }", null);
-  }
+            // Define a method to play or pause the video
+            @JavascriptInterface
+            public void playOrPause () {
+                // Get the video element from the webview
+                webView.evaluateJavascript ("var video = document.querySelector('video');", null);
+                // Toggle the playback state
+                webView.evaluateJavascript ("if (video.paused) { video.play(); } else { video.pause(); }", null);
+            }
 
-  // Define a method to seek forward or backward the video
-  @JavascriptInterface
-  public void seek (int seconds) {
-    // Get the video element from the webview
-    webView.evaluateJavascript ("var video = document.querySelector('video');", null);
-    // Seek the video by the given seconds
-    webView.evaluateJavascript ("video.currentTime += " + seconds + ";", null);
-  }
-}
+            // Define a method to seek forward or backward the video
+            @JavascriptInterface
+            public void seek (int seconds) {
+                // Get the video element from the webview
+                webView.evaluateJavascript ("var video = document.querySelector('video');", null);
+                // Seek the video by the given seconds
+                webView.evaluateJavascript ("video.currentTime += " + seconds + ";", null);
+            }
+        }
 
 // Add the custom JavaScript interface to the webview
 
@@ -496,7 +496,7 @@ public class MainActivity extends AppCompatActivity {
                     endark = "Disable";
                 }else{
                     endark = "Enable";
-               }
+                }
 
                 CharSequence[] items = {"Exit","Refresh Website", "Edit Homepage", offmode + " offline loading", enpip +" Background Play",endark +" Dark Mode","Check Update","Help","About", "Cancel"};
 
@@ -626,7 +626,7 @@ public class MainActivity extends AppCompatActivity {
                                 // do something for button 4
                                 break;
 
-                           case 5:
+                            case 5:
                                 if (darkm){
                                     darkmod.edit().putBoolean("darkmode", false ).apply();
                                     Toast.makeText(MainActivity.this, "Disabled Darkmode", Toast.LENGTH_SHORT).show();
@@ -638,7 +638,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 }
                                 hideView(dialogBack);
-                                
+
                                 break;
                             case 6:
                                 webView.loadUrl(sourcecode);
@@ -870,22 +870,22 @@ public class MainActivity extends AppCompatActivity {
                 // Show the loading indicator when the webview starts loading
                 loadingIndicator.setVisibility(View.VISIBLE);
                 PackageManager pm = getPackageManager();
-                view.evaluateJavascript(getScript1(), null);
+
                 // Check if the device is an Android TV
                 boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
 
-                    if (url.equals(homepge)) {
+                if (url.equals(homepge)) {
+                    hab.setVisibility(View.GONE);
+                    fab.setVisibility(View.VISIBLE);
+                } else {
+                    //Otherwise, hide the FAB
+
+                    fab.setVisibility(View.GONE);
+                    hab.setVisibility(View.VISIBLE);
+
+                    if (isTV) {
                         hab.setVisibility(View.GONE);
-                        fab.setVisibility(View.VISIBLE);
-                    } else {
-                        //Otherwise, hide the FAB
-
                         fab.setVisibility(View.GONE);
-                        hab.setVisibility(View.VISIBLE);
-
-                        if (isTV) {
-                            hab.setVisibility(View.GONE);
-                            fab.setVisibility(View.GONE);
                     }
                 }
                 super.onPageStarted(view, url, favicon);
@@ -908,19 +908,19 @@ public class MainActivity extends AppCompatActivity {
                 // If the device is not an Android TV, hide the status bar and the navigation bar
 
 
-                    if (url.equals(homepge)) {
-                        hab.setVisibility(View.GONE);
-                        fab.setVisibility(View.VISIBLE);
-                    } else {
-                        //Otherwise, hide the FAB
-                        fab.setVisibility(View.GONE);
-                        hab.setVisibility(View.VISIBLE);
+                if (url.equals(homepge)) {
+                    hab.setVisibility(View.GONE);
+                    fab.setVisibility(View.VISIBLE);
+                } else {
+                    //Otherwise, hide the FAB
+                    fab.setVisibility(View.GONE);
+                    hab.setVisibility(View.VISIBLE);
 
-                        if (isTV) {
-                            hab.setVisibility(View.GONE);
-                            fab.setVisibility(View.GONE);
-                        }
+                    if (isTV) {
+                        hab.setVisibility(View.GONE);
+                        fab.setVisibility(View.GONE);
                     }
+                }
 
             }
 
@@ -1354,7 +1354,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Check if the device is an Android TV
         boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
-        if (nocursor && isTV && keyCode == KeyEvent.KEYCODE_BACK){
+        if (nocursor && isTV && keyCode == KeyEvent.KEYCODE_BACK) {
             int action = event.getAction();
             if (action == KeyEvent.ACTION_DOWN) {
                 if (pointerMoveTimer != null) {
@@ -1396,6 +1396,12 @@ public class MainActivity extends AppCompatActivity {
                 backmenutimer.cancel();
                 //If the button is released within one second, perform the normal action only if the long press action flag is false
                 if (!isLongPressDone) {
+
+                    if (dialogBack.getVisibility() == View.VISIBLE) {
+                        hideView(dialogBack);
+                        return true;
+                    }
+
                     if (webClient.isFullScreen()) {
                         webClient.onHideCustomView();
 
@@ -1422,7 +1428,8 @@ public class MainActivity extends AppCompatActivity {
                                             // cancel the dialog
                                             dialog.cancel();
                                             hideView(dialogBack);
-                                        }})
+                                        }
+                                    })
                                     .show();
                             hideView(dialogBack);
 
@@ -1451,13 +1458,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
 
 
-
-
-
-
         }
 
-        if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_BACK || keyCode ==  KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+        if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 
             if (dialogBack.getVisibility() == View.VISIBLE && event.getAction() != KeyEvent.ACTION_UP) {
                 dialogEvent(keyCode);
@@ -1470,148 +1473,151 @@ public class MainActivity extends AppCompatActivity {
 
 
                         switch (keyCode) {
-  // If the play/pause key is pressed
-  case KeyEvent.KEYCODE_DPAD_CENTER:
-    // Call the playOrPause method of the custom JavaScript interface
-    webView.evaluateJavascript("MyJSInterface.playOrPause ();", null);
-    return true;
-  // If the forward key is pressed
-  case KeyEvent.KEYCODE_DPAD_RIGHT:
-    // Call the seek method of the custom JavaScript interface with 10 seconds
-    webView.evaluateJavascript("MyJSInterface.seek (10);", null);
-    return true;
-  // If the rewind key is pressed
-  case KeyEvent.KEYCODE_DPAD_LEFT:
-    // Call the seek method of the custom JavaScript interface with -10 seconds
-    webView.evaluateJavascript("MyJSInterface.seek (-10);", null);
-    return true;
-  // If any other key is pressed
-  default:
-    // Do nothing
-    return super.dispatchKeyEvent(event);
-}
-
-
-
-                    }
-
-                if (event.getAction() == KeyEvent.ACTION_UP) {
-                    if (pointerMoveTimer != null) {
-                        pointerMoveTimer.cancel();
-                    }
-                    firstDown = true;
-                    velocityX = 0;
-                    velocityY = 0;
-                    pointerVisibilityTimer = new CountDownTimer(3 * 1000, 1000) {
-                        @Override
-                        public void onTick(final long millisUntilFinished) {
+                            // If the play/pause key is pressed
+                            case KeyEvent.KEYCODE_DPAD_CENTER:
+                                // Call the playOrPause method of the custom JavaScript interface
+                                webView.evaluateJavascript("MyJSInterface.playOrPause ();", null);
+                                return true;
+                            // If the forward key is pressed
+                            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                                // Call the seek method of the custom JavaScript interface with 10 seconds
+                                webView.evaluateJavascript("MyJSInterface.seek (10);", null);
+                                return true;
+                            // If the rewind key is pressed
+                            case KeyEvent.KEYCODE_DPAD_LEFT:
+                                // Call the seek method of the custom JavaScript interface with -10 seconds
+                                webView.evaluateJavascript("MyJSInterface.seek (-10);", null);
+                                return true;
+                            // If any other key is pressed
+                            default:
+                                // Do nothing
+                                return super.dispatchKeyEvent(event);
                         }
 
-                        @Override
-                        public void onFinish() {
-                            mousePointer.setVisibility(View.GONE);
+
+                    }
+
+                    if (event.getAction() == KeyEvent.ACTION_UP) {
+                        if (pointerMoveTimer != null) {
+                            pointerMoveTimer.cancel();
                         }
-                    }.start();
-                    return true;
-                } else if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    if (pointerVisibilityTimer != null) {
-                        pointerVisibilityTimer.cancel();
-                    }
-                    if (mousePointer.getVisibility() == View.GONE) {
-                        mousePointer.setVisibility(View.VISIBLE);
-                    }
-                }
-                switch (keyCode) {
-                    case KeyEvent.KEYCODE_DPAD_CENTER:
-                        final long uMillis = SystemClock.uptimeMillis();
-                        frame.dispatchTouchEvent(MotionEvent.obtain(uMillis, uMillis,
-                                MotionEvent.ACTION_DOWN, x, y, 0));
-                        frame.dispatchTouchEvent(MotionEvent.obtain(uMillis, uMillis,
-                                MotionEvent.ACTION_UP, x, y, 0));
-                        break;
-                    case KeyEvent.KEYCODE_BACK:
+                        firstDown = true;
+                        velocityX = 0;
+                        velocityY = 0;
+                        pointerVisibilityTimer = new CountDownTimer(3 * 1000, 1000) {
+                            @Override
+                            public void onTick(final long millisUntilFinished) {
+                            }
 
-
-                        // If the device is not an Android TV, hide the status bar and the navigation bar
-                        if (!isTV) {
-                            if (webClient.isFullScreen()) {
-                            webClient.onHideCustomView();
+                            @Override
+                            public void onFinish() {
+                                mousePointer.setVisibility(View.GONE);
+                            }
+                        }.start();
+                        return true;
+                    } else if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                        if (pointerVisibilityTimer != null) {
+                            pointerVisibilityTimer.cancel();
+                        }
+                        if (mousePointer.getVisibility() == View.GONE) {
+                            mousePointer.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    switch (keyCode) {
+                        case KeyEvent.KEYCODE_DPAD_CENTER:
+                            final long uMillis = SystemClock.uptimeMillis();
+                            frame.dispatchTouchEvent(MotionEvent.obtain(uMillis, uMillis,
+                                    MotionEvent.ACTION_DOWN, x, y, 0));
+                            frame.dispatchTouchEvent(MotionEvent.obtain(uMillis, uMillis,
+                                    MotionEvent.ACTION_UP, x, y, 0));
                             break;
-                        } else {
-                                
-                            if (!webView.canGoBack()) {
-                                //hideView(dialogBack);
-                                // create an array of items to display
-                                new AlertDialog.Builder(this)
-                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                        .setTitle("Closing Application")
-                                        .setMessage("Are you sure you want to close this application?")
-                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                // call the finish method to end the activity
-                                                finish();
-                                            }
-                                        })
-                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                // cancel the dialog
-                                                dialog.cancel();
-                                                hideView(dialogBack);
-                                            }})
-                                        .show();
-                                hideView(dialogBack);
+                        case KeyEvent.KEYCODE_BACK:
 
-                                break;
-                            
-                            } else {
-                                if (isError) {
-                                    // Set the error status to false
-                                    isError = false;
-                                    // Go back to the previous page in the WebView
-                                    webView.loadUrl(lastSuccessUrl);
+
+                            // If the device is not an Android TV, hide the status bar and the navigation bar
+                            if (!isTV) {
+                                if (webClient.isFullScreen()) {
+                                    webClient.onHideCustomView();
                                     break;
                                 } else {
-                                    // Otherwise, call the super method
-                                    webView.goBack();
 
+                                    if (!webView.canGoBack()) {
+                                        //hideView(dialogBack);
+                                        // create an array of items to display
+                                        new AlertDialog.Builder(this)
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .setTitle("Closing Application")
+                                                .setMessage("Are you sure you want to close this application?")
+                                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // call the finish method to end the activity
+                                                        finish();
+                                                    }
+                                                })
+                                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // cancel the dialog
+                                                        dialog.cancel();
+                                                        hideView(dialogBack);
+                                                    }
+                                                })
+                                                .show();
+                                        hideView(dialogBack);
+
+                                        break;
+
+                                    } else {
+                                        if (isError) {
+                                            // Set the error status to false
+                                            isError = false;
+                                            // Go back to the previous page in the WebView
+                                            webView.loadUrl(lastSuccessUrl);
+                                            break;
+                                        } else {
+                                            // Otherwise, call the super method
+                                            webView.goBack();
+
+                                        }
+                                        //webView.goBack();
+                                        break;
+                                    }
                                 }
-                                //webView.goBack();
-                                break;
                             }
-                        }
-                        }
-                        if (webClient.isFullScreen()) {
-                            webClient.onHideCustomView();
-                        } else {
-                            // if (nocursor) {
-                            //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
+                            if (webClient.isFullScreen()) {
+                                webClient.onHideCustomView();
+                            } else {
+                                // if (nocursor) {
+                                //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
 
-                            //}
-                            dialogBack.setVisibility(View.VISIBLE);
-                            panelViews[row][column].requestFocus();
-                        }
-                        break;
+                                //}
+                                dialogBack.setVisibility(View.VISIBLE);
+                                panelViews[row][column].requestFocus();
+                            }
+                            break;
 
-                }
+                    }
 
-                if (firstDown) {
-                    firstDown = false;
-                    pointerMoveTimer = new Timer();
-                    pointerMoveTimer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            movePointer();
-                        }
-                    }, 0, 1000 / 60);
+                    if (firstDown) {
+                        firstDown = false;
+                        pointerMoveTimer = new Timer();
+                        pointerMoveTimer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                movePointer();
+                            }
+                        }, 0, 1000 / 60);
 
+                    }
+
+                    return true;
                 }
             }
-            return true;
-        }else{
+        } else {
             return super.dispatchKeyEvent(event);
         }
+        return true;
     }
 
-}
+    }
