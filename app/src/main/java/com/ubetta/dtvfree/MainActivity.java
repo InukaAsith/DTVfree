@@ -901,7 +901,7 @@ public class MainActivity extends AppCompatActivity {
                 boolean isTV = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
                 //Assuming you have a WebView object named webView
                 //webView.evaluateJavascript("document.getElementById('fullscreenButton').click();", null);
-                webView.evaluateJavascript("var video = document.querySelector('video'); if (video.webkitEnterFullscreen) { video.webkitEnterFullscreen(); }", null);
+               // webView.evaluateJavascript("var video = document.querySelector('video'); if (video.webkitEnterFullscreen) { video.webkitEnterFullscreen(); }", null);
                 // If the device is not an Android TV, hide the status bar and the navigation bar
 
 
