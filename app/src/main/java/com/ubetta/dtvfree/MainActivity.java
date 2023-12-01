@@ -902,7 +902,7 @@ public class MainActivity extends AppCompatActivity {
                 //Assuming you have a WebView object named webView
                 //webView.evaluateJavascript("document.getElementById('fullscreenButton').click();", null);
 
-                view.evaluateJavascript(getScript1(), null);
+                webView.evaluateJavascript("var videos = document.querySelectorAll('video'); for (var i = 0; i < videos.length; i++) { var video = videos[i]; video.addEventListener('play', function() { if (video.webkitEnterFullscreen) { video.webkitEnterFullscreen(); } }); }", null);
                 // If the device is not an Android TV, hide the status bar and the navigation bar
 
 
@@ -1369,17 +1369,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onFinish() {
                         //If the button is still pressed after one second, perform the long press action
-                        if (webClient.isFullScreen()) {
-                            webClient.onHideCustomView();
 
-                        } else {
+
                             // if (nocursor) {
                             //  cursorButton.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.cursor_background));
 
                             //}
                             dialogBack.setVisibility(View.VISIBLE);
                             panelViews[row][column].requestFocus();
-                        }
+
                         //Set the long press action flag to true
                         isLongPressDone = true;
 
@@ -1395,10 +1393,11 @@ public class MainActivity extends AppCompatActivity {
 
                     if (dialogBack.getVisibility() == View.VISIBLE){
                         hideView(dialogBack);
-
+                        return true;
                     }
 
-                    else if (webClient.isFullScreen()) {
+
+                    if (webClient.isFullScreen()) {
                         webClient.onHideCustomView();
 
                     } else {
@@ -1435,11 +1434,13 @@ public class MainActivity extends AppCompatActivity {
                                 // Go back to the previous page in the WebView
                                 Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
                                 webView.loadUrl(lastSuccessUrl);
+                                hideView(dialogBack);
 
                             } else {
                                 // Otherwise, call the super method
                                 Toast.makeText(MainActivity.this, "Long Press Back Button for menu", Toast.LENGTH_SHORT).show();
                                 webView.goBack();
+                                hideView(dialogBack);
 
                             }
                             //webView.goBack();
@@ -1468,15 +1469,16 @@ public class MainActivity extends AppCompatActivity {
                 if (nocursor) {
 
                     // return super.dispatchKeyEvent(event);
+    /*
                     if (webClient.isimFullScreen() && keyCode != KeyEvent.KEYCODE_BACK && isTV) {
 
 
                         switch (keyCode) {
                             // If the play/pause key is pressed
-                            case KeyEvent.KEYCODE_DPAD_CENTER:
+                            //case KeyEvent.KEYCODE_DPAD_CENTER:
                                 // Call the playOrPause method of the custom JavaScript interface
-                                webView.evaluateJavascript("MyJSInterface.playOrPause ();", null);
-                                return true;
+                                //webView.evaluateJavascript("MyJSInterface.playOrPause ();", null);
+                                //return true;
                             // If the forward key is pressed
                             case KeyEvent.KEYCODE_DPAD_RIGHT:
                                 // Call the seek method of the custom JavaScript interface with 10 seconds
@@ -1494,7 +1496,14 @@ public class MainActivity extends AppCompatActivity {
 
                         }
                     }
+*/
 
+                    if (keyCode != KeyEvent.KEYCODE_BACK){
+                        return super.dispatchKeyEvent(event);
+                        //dialogBack.setVisibility(View.VISIBLE);
+                        //panelViews[row][column].requestFocus();
+
+                    }
 
                     }
 
