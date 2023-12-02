@@ -919,39 +919,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
-                                   // Set a WebViewClient class
-
-    // Set a WebViewClient class
-
-    webView.evaluateJavascript("var video = document.querySelector('video'); if (video != null) { return true; } else { return false; }", new ValueCallback<String>() {
-      @Override
-      public void onReceiveValue(String value) {
-        // Check if there is a video element in the page
-        if (Boolean.parseBoolean(value)) {
-          // Post a delayed runnable
-          webView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-              // Touch a specific position on the screen
-              // For example, 10% of the width and 20% of the height
-              int x = (int) (webView.getWidth() * 0.1);
-              int y = (int) (webView.getHeight() * 0.2);
-              // Create a MotionEvent object
-              long downTime = SystemClock.uptimeMillis();
-              long eventTime = SystemClock.uptimeMillis() + 100;
-              int action = MotionEvent.ACTION_DOWN;
-              int metaState = 0;
-              MotionEvent motionEvent = MotionEvent.obtain(downTime, eventTime, action, x, y, metaState);
-              // Dispatch the touch event to the webview
-              webView.dispatchTouchEvent(motionEvent);
-            }
-          }, 5000); // 5 seconds
-        }
-      }
-    });
-  
-
-  
 
             }
 
