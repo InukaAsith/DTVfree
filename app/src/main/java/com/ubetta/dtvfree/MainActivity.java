@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
     private final int UP = 0,DOWN = 1,LEFT = 2,RIGHT = 3;
     private boolean isError; // A flag to indicate if there is an error
     private boolean isdarkm = false;
+    private boolean canvas = false;
     private boolean isLongPressDone = false;
     Handler handler = new Handler(Looper.getMainLooper());
     private String lastSuccessUrl;
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
 
                     case 2:
-                        webView.evaluateJavascript("var button = document.getElementsByClassName('explicit-resolution')[2]; if (button != null) { button.click(); }", null);
+                        webView.evaluateJavascript("var button = document.getElementsByClassName('explicit-resolution')[2]; if (button != null) { button.click(); }" , null);
                         dialog.cancel();
                         break;
 
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 4:
 
-                        webView.evaluateJavascript("var button = document.getElementsByClassName('explicit-resolution')[4]; if (button != null) { button.click(); }", null);
+                        webView.evaluateJavascript( "var button = document.getElementsByClassName('explicit-resolution')[4]; if (button != null) { button.click(); }", null);
                         dialog.cancel();
                         break;
 
@@ -175,10 +176,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void canvasIsAbsent() {
-
+        canvas = false;
         // Code to run when the canvas element is absent
     }
-
+    public void canvasIsthere() {
+        canvas = true;
+        // Code to run when the canvas element is absent
+    }
 
 
     public class MyJavaScriptInterface {
@@ -200,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
             @JavascriptInterface
             public void canvasPresent () {
                 // Code to run in MainActivity when canvas is present
-                ((MainActivity) mContext).canvasIsPresent();
+                ((MainActivity) mContext).canvasIsthere();
             }
 
             @JavascriptInterface
@@ -208,6 +212,13 @@ public class MainActivity extends AppCompatActivity {
                 // Code to run in MainActivity when canvas is absent
                 ((MainActivity) mContext).canvasIsAbsent();
             }
+
+        @JavascriptInterface
+        public void evaluateScript(String script) {
+            // Execute the script using eval()
+            mWebView.post(() -> mWebView.evaluateJavascript("eval(" + script + ")", null));
+        }
+
 
         // Other methods...
     }
@@ -1603,6 +1614,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                     if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN){
                         webView.evaluateJavascript("MyJSInterface.checkCanvasPresence()", null);
+                        if(canvas){
+                            canvasIsPresent();
+                        }
 
 
                         return super.dispatchKeyEvent(event);
