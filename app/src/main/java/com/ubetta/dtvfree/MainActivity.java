@@ -49,6 +49,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.URLUtil;
 
 import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -167,16 +168,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
         AlertDialog dialog1 = builder.create();
-        if(dialog1.isShowing()){
-            dialog1.cancel();
+        if(!dialog1.isShowing()){
+            dialog1.show();
         }
-        dialog1.show();
+
     }
 
     public void canvasIsAbsent() {
 
         // Code to run when the canvas element is absent
     }
+
 
 
     public class MyJavaScriptInterface {
@@ -188,32 +190,24 @@ public class MainActivity extends AppCompatActivity {
             mContext = c;
             mWebView = webView;
         }
+            @JavascriptInterface
+            public void checkCanvasPresence () {
+                // Execute JavaScript to check for the canvas element
+                mWebView.post(() -> mWebView.evaluateJavascript("var canvas = document.getElementsByClassName('explicit-resolution')[0];" +
+                        "if (canvas != null) { MyJSInterface.canvasPresent(); } else { null; }", null));
+            }
 
-        // Existing methods...
+            @JavascriptInterface
+            public void canvasPresent () {
+                // Code to run in MainActivity when canvas is present
+                ((MainActivity) mContext).canvasIsPresent();
+            }
 
-        @JavascriptInterface
-        public void checkCanvasPresence() {
-            // Execute JavaScript to check for the canvas element
-            mWebView.post(new Runnable() {
-                @Override
-                public void run() {
-                    mWebView.evaluateJavascript("var canvas = document.getElementsByClassName('explicit-resolution')[0];" +
-                            "if (canvas != null) { Android.canvasPresent(); } else { null; }", null);
-                }
-            });
-        }
-
-        @JavascriptInterface
-        public void canvasPresent() {
-            // Code to run in MainActivity when canvas is present
-            ((MainActivity) mContext).canvasIsPresent();
-        }
-
-        @JavascriptInterface
-        public void canvasAbsent() {
-            // Code to run in MainActivity when canvas is absent
-            ((MainActivity) mContext).canvasIsAbsent();
-        }
+            @JavascriptInterface
+            public void canvasAbsent () {
+                // Code to run in MainActivity when canvas is absent
+                ((MainActivity) mContext).canvasIsAbsent();
+            }
 
         // Other methods...
     }
@@ -989,7 +983,7 @@ public class MainActivity extends AppCompatActivity {
                 //webView.evaluateJavascript("document.getElementById('fullscreenButton').click();", null);
                // webView.evaluateJavascript("var video = document.querySelector('video'); if (video.webkitEnterFullscreen) { video.webkitEnterFullscreen(); }", null);
                 // If the device is not an Android TV, hide the status bar and the navigation bar
-                webView.evaluateJavascript("MyJSInterface.gofscreen ();", null);
+                //webView.evaluateJavascript("MyJSInterface.checkfullscreenPresence()", null);
                 webView.evaluateJavascript("var canvas = document.getElementsByClassName('shaka-overflow-button'); if (canvas != null) { return true; } else { return false; }", new ValueCallback<String>() {
                     @Override
                     public void onReceiveValue(String value) {
@@ -1148,6 +1142,8 @@ public class MainActivity extends AppCompatActivity {
         assert dm != null;
         dm.enqueue(request);
     }
+
+    // Code to run when the canvas element is absent
 
     private void showLongPressMenu(String linkUrl, String imageUrl) {
         String url;
@@ -1606,10 +1602,7 @@ public class MainActivity extends AppCompatActivity {
                         return super.dispatchKeyEvent(event);
                     }
                     if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN){
-                        if (webClient.isFullScreen()) {
-                            canvasIsPresent();
-                        }
-                        //webView.evaluateJavascript("MyJSInterface.checkCanvasPresence()", null);
+                        webView.evaluateJavascript("MyJSInterface.checkCanvasPresence()", null);
 
 
                         return super.dispatchKeyEvent(event);
